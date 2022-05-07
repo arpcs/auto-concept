@@ -2,5 +2,5 @@
 #include "..\AutoConcept\AutoConcept.h"
 
 int main(int argc, const char** argv) {
-    return RunApp(argc, argv);
+    return auto_concept::RunApp(argc, argv);
 }

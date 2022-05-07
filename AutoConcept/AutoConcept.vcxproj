@@ -280,14 +280,21 @@
       <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MinimalRebuild>
       <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='ReleaseFast|x64'">false</MinimalRebuild>
     </ClCompile>
+    <ClCompile Include="CommandLine.cpp" />
+    <ClCompile Include="Consumer.cpp" />
     <ClCompile Include="Matchers.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseFast|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="MatchHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoConcept.h" />
+    <ClInclude Include="Consumer.h" />
+    <ClInclude Include="FrontendAction.h" />
     <ClInclude Include="Matchers.h" />
+    <ClInclude Include="MatchHandler.h" />
+    <ClInclude Include="CommandLine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "defines.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include <vector>
 

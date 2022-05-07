@@ -1,23 +1,28 @@
 #include "pch.h"
 
-using namespace std;
+#include "gtest/gtest.h"
 
-TEST(TestCaseName, TestName) {
-	
-	
-  EXPECT_EQ(runner("template<typename T> void f(T t) {return t;}"), "template<typename T> void f(T t) {return t;}");
+namespace auto_concept_test {
 
-  TestReader reader("RewriteTests.cpp");
+	using namespace std;
 
-  for (auto& testCase: reader)
-  {
-	  EXPECT_EQ(runner(testCase.test), testCase.expected);
-  }
+	TEST(TestCaseName, TestName) {
 
-  EXPECT_TRUE(true);
+
+		EXPECT_EQ(runner("template<typename T> void f(T t) {return t;}"), "template<typename T> void f(T t) {return t;}");
+
+		TestReader reader("RewriteTests.cpp");
+
+		for (auto& testCase : reader)
+		{
+			EXPECT_EQ(runner(testCase.test), testCase.expected);
+		}
+
+		EXPECT_TRUE(true);
+	}
+
+	/*int main(int argc, char** argv) {
+		::testing::InitGoogleTest(&argc, argv);
+		return RUN_ALL_TESTS();
+	}*/
 }
-
-/*int main(int argc, char** argv) {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
-}*/

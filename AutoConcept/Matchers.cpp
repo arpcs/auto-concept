@@ -33,7 +33,7 @@ vector<DeclarationMatcher> GetMatchers() {
         has(
             functionDecl()
         )
-        ).bind("function-to-autoconcept6")
+        ).bind("function-to-autoconcept")
     );
     return matchers;
 }
