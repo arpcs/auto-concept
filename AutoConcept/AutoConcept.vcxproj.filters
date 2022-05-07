@@ -18,12 +18,6 @@
     <ClCompile Include="AutoConcept.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\x64\Release\test-old.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main-old.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Matchers.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
@@ -33,9 +27,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Matchers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MatcherProvider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
