@@ -34,6 +34,7 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/WithColor.h"
 
 // Standard includes
 #include <cassert>
@@ -43,6 +44,7 @@
 
 #include <iostream>
 #include <concepts>
+#include <variant>
 
 #include "MatchHandler.h"
 #include "Consumer.h"
@@ -50,82 +52,38 @@
 
 
 namespace auto_concept {
+    using namespace clang::ast_matchers::internal;
+    using namespace clang::ast_matchers::dynamic;
     using namespace clang::ast_matchers;
     using namespace clang::tooling;
     using namespace clang;
     using namespace llvm;
+    using namespace std;
 
     void Consumer::Consume() noexcept {
-            //void HandleTranslationUnit(clang::ASTContext& Context) {
-            using namespace clang::ast_matchers;
-
-            /*const auto Matcher = functionTemplateDecl(
-                isExpansionInMainFile(),
-                has(
-                    functionDecl(
-                        hasAnyBody(
-                            compoundStmt(
-                                hasDescendant(
-                                    callExpr(
-                                        //has(unresolvedLookupExpr( has(functionDecl()) ) )
-
-                                        callee(functionDecl(
-                                            hasName("advance"),
-                                            hasParameter(0,varDecl().bind("advance-param"))
-                                        ))
-
-                                    ).bind("advance-function")
-                                )
-                            )
-                        )
-                    )
-                )
-            ).bind("function-to-autoconcept");*/
-
-            const auto matcher = functionTemplateDecl(
-                isExpansionInMainFile(),
-                has(
-                    functionDecl()
-                )
-            ).bind("function-to-autoconcept");
-            matchFinder.addMatcher(matcher, &handler);
-
-            std::vector<int>::iterator;
-
-            std::string dynMatcher = R"(functionTemplateDecl(
-                isExpansionInMainFile(),
-                has(
-                    functionDecl()
-                )
-            ).bind("asdLOl"))";
-
-            using namespace llvm;
-            using namespace clang::ast_matchers::dynamic;
-            Diagnostics Diag;
-            dynamic::VariantValue Value;
-            llvm::StringRef dynMatcherRef = dynMatcher;
-            auto parsedMatcher = Parser::parseMatcherExpression(dynMatcherRef, &Diag);
-            if (parsedMatcher.hasValue()) {
-                auto& parsedMatcherVal = parsedMatcher.getValue();
-                matchFinder.addDynamicMatcher(parsedMatcherVal, &handler);
-            }
-
-            //DynTypedMatcher matcher = dynMatcher;
-            //llvm::Optional<DynTypedMatcher> M = matcher.tryBind("root");
-            //auto MaybeBoundMatcher = *M;
-            //matchFinder.addDynamicMatcher(rett, &handler);
-            //matchFinder.addDynamicMatcher(MaybeBoundMatcher, &handler);
-
-
+            Diagnostics Diag;           
             auto matchers = GetMatchers();
-            for (const auto& matcher : matchers)
+            for (const auto& matcherRaw : matchers)
             {
-                matchFinder.addMatcher(matcher, &handler);
+                variant<string, DeclarationMatcher> matcher = matcherRaw;
+                if constexpr        (same_as<std::remove_cvref_t<decltype(matcherRaw)>, DeclarationMatcher>) {
+                    matchFinder.addMatcher(get<DeclarationMatcher>(matcher), &handler);
+                }
+                else if constexpr   (same_as< std::remove_cvref_t<decltype(matcherRaw)>, string>) {
+                    string matcherStr = get<string>(matcher);
+                    StringRef matcherStrRef = matcherStr;
+                    auto parsedMatcher = Parser::parseMatcherExpression(matcherStrRef, &Diag);
+                    if (parsedMatcher.hasValue()) {
+                        matchFinder.addDynamicMatcher(parsedMatcher.getValue(), &handler);
+                    }
+                    else {
+                        llvm::WithColor color(llvm::errs(), raw_ostream::Colors::RED);
+                        llvm::errs() << "ERROR: Unable to parse the following matcher:\n";
+                        llvm::errs() << "\""<<matcherStrRef << "\"\n";
+                    }
+                }
             }
-            //matchFinder.addMatcher(matcher, &handler);
 
-            //matchFinder.addMatcher(matcher, &handler);
-            //Finder.matchAST(Context);
         }
 
 }

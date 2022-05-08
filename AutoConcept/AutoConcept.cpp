@@ -32,6 +32,7 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/WithColor.h"
 
 // Standard includes
 #include <cassert>
@@ -62,6 +63,7 @@ namespace auto_concept {
         auto ExpectedParser = CommonOptionsParser::create(argc, argv, CLOptions::MyToolCategory);
         if (!ExpectedParser) {
             // Fail gracefully for unsupported options.
+            llvm::WithColor color(llvm::errs(), raw_ostream::Colors::RED);
             llvm::errs() << ExpectedParser.takeError();
             return 1;
         }
@@ -90,6 +92,7 @@ namespace auto_concept {
         auto ExpectedParser = CommonOptionsParser::create(argc, argv, CLOptions::MyToolCategory);
         if (!ExpectedParser) {
             // Fail gracefully for unsupported options.
+            llvm::WithColor color(llvm::errs(), raw_ostream::Colors::RED);
             llvm::errs() << ExpectedParser.takeError();
             return 1;
         }
