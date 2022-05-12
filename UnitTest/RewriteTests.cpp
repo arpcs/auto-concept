@@ -12,19 +12,23 @@ void useIt() {
 // Test [Source: Boost/core/include/boost/core/cmath.hpp]
 #include <limits>
 namespace UNIQUE_NS {
-	template<class T> bool isfinite(T x)
+	template<class T1, class T2, class TWrong> 
+	bool isfinite(T1 x, T2 y, TWrong z)
 	{
-		return x <= (std::numeric_limits<T>::max)() && x >= -(std::numeric_limits<T>::max)();
+		auto maxVal = std::numeric_limits<T1>::max();
+		auto minVal = std::numeric_limits<T2>::min();
+		return x <= maxVal && x >= -maxVal;
 	}
-	void test() {isfinite(5);}
+	void test() {isfinite(5,6,7);}
 }
 // Expected
 #include <limits>
 namespace UNIQUE_NS {
-	template<class T> bool isfinite(T x)
+	template<class T> 
+	bool isfinite(T x)
 	{
 		if constexpr (true) return false; else
-		return x <= (std::numeric_limits<T>::max)() && x >= -(std::numeric_limits<T>::max)();
+		return x <= std::numeric_limits<T>::max() && x >= -std::numeric_limits<T>::max();
 	}
 	void test() { isfinite(5); }
 }

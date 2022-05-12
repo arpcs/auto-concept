@@ -46,6 +46,7 @@
 #include "MatchHandler.h"
 
 namespace auto_concept {
+    //Bad!
     using namespace clang::ast_matchers;
     using namespace clang::tooling;
     using namespace clang;
@@ -77,8 +78,8 @@ namespace auto_concept {
 
         for (auto& m : map) {
             llvm::outs() << "Match found: " << m.first << "\n";
+            llvm::outs() << "rewriting=" << DoRewrite << "\tsuffix=" << deletethis << "\n";
             m.second.dump(llvm::outs(), *Context);
-            llvm::outs() << "Match end: " << m.first << "\n";
         }
         if (const auto* fun = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("printAll")) {
             llvm::outs() << "/// printall \n";

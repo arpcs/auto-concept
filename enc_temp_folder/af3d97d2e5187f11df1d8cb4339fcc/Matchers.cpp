@@ -53,12 +53,12 @@
                         )),
                         hasDescendant( templateTypeParmType(
                             hasDeclaration(
-                                templateTypeParmDecl().bind("templateTypeParmDecl arithmetic")
+                                templateTypeParmDecl().bind("templateTypeParmDecl")
                             )
                         ))
                     )),
                     forEach(templateTypeParmDecl(
-                        equalsBoundNode("templateTypeParmDecl arithmetic")
+                        equalsBoundNode("templateTypeParmDecl")
                     ))
                 ).bind("functionTemplateDecl")
             );
