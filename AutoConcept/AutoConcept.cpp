@@ -39,7 +39,7 @@
 #include <memory>
 #include <string>
 #include <type_traits>
-
+#include <filesystem>
 #include <iostream>
 #include <concepts>
 
@@ -89,6 +89,8 @@ namespace auto_concept {
         const std::string suffixRewriteArg = "-rewrite-suffix=" + testSuffix;
         const char* argv[] = { "AutoConceptTest", testFileIn.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--" };
 
+        if (std::filesystem::exists(testFileOut)) std::filesystem::remove(testFileOut);
+
         auto ExpectedParser = CommonOptionsParser::create(argc, argv, CLOptions::MyToolCategory);
         if (!ExpectedParser) {
             // Fail gracefully for unsupported options.
@@ -114,6 +116,7 @@ namespace auto_concept {
 
         // Map the string reference to a virtual file when testing
         Tool.mapVirtualFile(testFileIn, virtualFile);
+      
 
         //auto action = newFrontendActionFactory<AutoConcept::Action>();
         auto factory = std::make_unique<ToolFactory>();

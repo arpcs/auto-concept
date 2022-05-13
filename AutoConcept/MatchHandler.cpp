@@ -75,41 +75,19 @@ namespace auto_concept {
         ASTContext* Context = Result.Context;
         auto& map = Result.Nodes.getMap();
 
-
         for (auto& m : map) {
             llvm::outs() << "Match found: " << m.first << "\n";
             m.second.dump(llvm::outs(), *Context);
             llvm::outs() << "Match end: " << m.first << "\n";
         }
 
-        //matches[]
-
-        if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl rewrite")) {
+        if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl rewrite")) 
             matches[func->getID()].push_back(Result);
-            if (const auto* param = Result.Nodes.getNodeAs<clang::TemplateTypeParmDecl>("templateTypeParmDecl arithmetic")) {
 
-                const auto& funcDecl = func->getTemplatedDecl();
-                const std::string& paramName = param->getName().str();
-
-                FullSourceLoc FullLocation = Context->getFullLoc(funcDecl->getBeginLoc());
-                FullLocation.getColumnNumber();
-                SourceLocation s = funcDecl->getBeginLoc();
-               
-                auto& DiagnosticsEngine = Context->getDiagnostics();
-                RewriterPointer Rewriter;
-                if (DoRewrite) Rewriter = createRewriter(DiagnosticsEngine, *Context);
-
-                // ToDo: \t....
-                auto FixIt = FixItHint::CreateInsertion(funcDecl->getBeginLoc(), "requires std::is_arithmetic_v<" + paramName + ">\n\t");
-                auto& diag = Context->getDiagnostics();
-                const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Please rename this");
-                diag.Report(funcDecl->getBeginLoc(), diagID).AddFixItHint(FixIt);
-
-                if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
-            }
-        }
-       
-
+        RewriterPointer Rewriter;
+        auto& DiagnosticsEngine = Context->getDiagnostics();
+        if (DoRewrite) Rewriter = createRewriter(DiagnosticsEngine, *Context);
+        if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
     }
     void MatchHandler::onStartOfTranslationUnit() {
         matches.clear();
@@ -131,21 +109,29 @@ namespace auto_concept {
                 if (DoRewrite) Rewriter = createRewriter(DiagnosticsEngine, *firstContext);
 
                 string replaceText = "requires ";
-                for (int i = 0; auto & match : matchesPair.second) {
-                    if (const auto* param = firstMatch.Nodes.getNodeAs<clang::TemplateTypeParmDecl>("templateTypeParmDecl arithmetic")) {
+                string noteText = "";
+                int i = 0;
+                for (auto & match : matchesPair.second) {
+                    if (const auto* param = match.Nodes.getNodeAs<clang::TemplateTypeParmDecl>("templateTypeParmDecl arithmetic")) {
                         const std::string& paramName = param->getName().str();
                         if (i++ != 0) replaceText += "&& ";
+                        if (i != 0) noteText += " ";
                         replaceText += "std::is_arithmetic_v<" + paramName + "> ";
+                        noteText += "(arithmetic)'" + paramName + "'";
                     }
                 }
                 
                 // ToDo: \t....
-                auto FixIt = FixItHint::CreateInsertion(funcDecl->getBeginLoc(), replaceText + ">\n\t");
+                auto FixIt = FixItHint::CreateInsertion(funcDecl->getBeginLoc(), replaceText + "\n\t");
                 auto& diag = firstContext->getDiagnostics();
-                const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Consider adding concept to function {0}");
-                auto builder = diag.Report(funcDecl->getBeginLoc(), diagID);
-                builder.AddString(func->getQualifiedNameAsString());
-                builder.AddFixItHint(FixIt);
+                const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Consider adding concept to template(s): %0");
+                // So we destroy our builder to execute it..
+                {
+                    const auto& builder = diag.Report(func->getBeginLoc(), diagID);
+                    builder.AddString(noteText);
+                    builder.AddFixItHint(FixIt);
+                }
+    
 
                 if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
             }
