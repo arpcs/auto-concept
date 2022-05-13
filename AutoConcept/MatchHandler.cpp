@@ -83,15 +83,12 @@ namespace auto_concept {
 
         if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl rewrite")) 
             matches[func->getID()].push_back(Result);
-
-        RewriterPointer Rewriter;
-        auto& DiagnosticsEngine = Context->getDiagnostics();
-        if (DoRewrite) Rewriter = createRewriter(DiagnosticsEngine, *Context);
-        if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
     }
+
     void MatchHandler::onStartOfTranslationUnit() {
         matches.clear();
     }
+
     void MatchHandler::onEndOfTranslationUnit() {      
         for (auto& matchesPair : matches) {
             auto firstMatch = *matchesPair.second.begin();

@@ -53,15 +53,13 @@ namespace auto_concept {
     using namespace llvm::cl;
 
 
-        // Apply a custom category to all command-line options so that they are the
-        // only ones displayed.
+        // Apply a custom category to all command-line options so that they are the only ones displayed.
         OptionCategory CLOptions::MyToolCategory("my-tool options");
 
         // CommonOptionsParser declares HelpMessage with a description of the common
         // command-line options related to the compilation database and input files.
         // It's nice to have this help message in all tools.
         extrahelp CLOptions::CommonHelp(CommonOptionsParser::HelpMessage);
-
 
         llvm::cl::opt<bool> CLOptions::RewriteOption("rewrite",
                 llvm::cl::init(false),
@@ -71,7 +69,6 @@ namespace auto_concept {
         llvm::cl::opt<std::string> CLOptions::RewriteSuffixOption("rewrite-suffix",
             llvm::cl::desc("If -rewrite is set, changes will be rewritten to a file with the same name, but this suffix"),
             llvm::cl::cat(MyToolCategory));
-
 
         // A help message for this specific tool can be added afterwards.
         extrahelp CLOptions::MoreHelp("\nMore help text...");

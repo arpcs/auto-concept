@@ -17,7 +17,7 @@
     namespace auto_concept {
         inline std::vector<std::string> GetMatchers(){
             std::vector<std::string> result;
-            std::ifstream file("../AutoConcept/Matchers.cpp");
+            std::ifstream file("../AutoConcept/MatchersDeduced.cpp");
             if (!file.is_open()) {
                 llvm::errs() << "ERROR: Can't open matcher file!\n";
                 return {};

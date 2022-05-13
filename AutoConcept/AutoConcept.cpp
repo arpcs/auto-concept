@@ -99,30 +99,19 @@ namespace auto_concept {
             return 1;
         }
         CommonOptionsParser& OptionsParser = ExpectedParser.get();
-        //StandaloneToolExecutor
-        //llvm::vfs::InMemoryFileSystem s();
-        //IntrusiveRefCntPtr<llvm::vfs::FileSystem>(s);
-        //llvm::vfs::InMemoryFileSystem fs();
-        //auto hmi = IntrusiveRefCntPtr<llvm::vfs::FileSystem>(std::make_unique<llvm::vfs::InMemoryFileSystem>());
 
         ClangTool    Tool(OptionsParser.getCompilations(),
             OptionsParser.getSourcePathList(),
             std::make_shared<PCHContainerOperations>(),
-            //hmi
             llvm::vfs::getRealFileSystem()
-            //IntrusiveRefCntPtr<llvm::vfs::FileSystem>(  std::make_unique<llvm::vfs::InMemoryFileSystem>() )
-            //IntrusiveRefCntPtr(llvm::vfs::InMemoryFileSystem())
         );
 
         // Map the string reference to a virtual file when testing
         Tool.mapVirtualFile(testFileIn, virtualFile);
-      
 
-        //auto action = newFrontendActionFactory<AutoConcept::Action>();
         auto factory = std::make_unique<ToolFactory>();
         auto result = Tool.run(factory.get());
 
-        // Todo: a less ugly version
         if (auto FixedVirtualFile = Tool.getFiles().getVirtualFileSystem().openFileForRead(testFileOut)) {
             if (auto FixedVirtualFileBuffer = FixedVirtualFile.get().get()->getBuffer(testFileOut)) {
                 virtualFile = FixedVirtualFileBuffer.get().get()->getBuffer().str();

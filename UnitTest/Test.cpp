@@ -11,7 +11,7 @@ namespace auto_concept_test {
 
 		EXPECT_EQ(runner("template<typename T> void f(T t) {return t;}"), "template<typename T> void f(T t) {return t;}");
 
-		TestReader reader("RewriteTests.cpp");
+		TestReader reader("RewriteTestsDeduced.cpp");
 
 		for (auto& testCase : reader)
 		{

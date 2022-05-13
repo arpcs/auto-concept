@@ -3,7 +3,7 @@
   <ItemGroup>
     <ClCompile Include="test.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="RewriteTests.cpp">
+    <ClCompile Include="RewriteTestsDeduced.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>

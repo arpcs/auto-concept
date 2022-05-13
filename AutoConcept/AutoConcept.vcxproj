@@ -364,7 +364,7 @@
     </ClCompile>
     <ClCompile Include="CommandLine.cpp" />
     <ClCompile Include="Consumer.cpp" />
-    <ClCompile Include="Matchers.cpp">
+    <ClCompile Include="MatchersDeduced.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseFast|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugFast|x64'">true</ExcludedFromBuild>

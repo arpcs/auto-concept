@@ -54,21 +54,13 @@ namespace auto_concept {
         FixItRewriterOptions FixItOptions;
         std::unordered_map< int64_t, clang::SmallVector<MatchResult> > matches;
         bool DoRewrite;
-        /// Allocates a \c FixItRewriter and sets it as the client of the given \p
-        /// DiagnosticsEngine.
-        ///
+        /// Allocates a \c FixItRewriter and sets it as the client of the given \p DiagnosticsEngine.
         /// The \p Context is forwarded to the constructor of the \c FixItRewriter.
         RewriterPointer createRewriter(clang::DiagnosticsEngine& DiagnosticsEngine, clang::ASTContext& Context);
     public:
-        /// Constructor.
-        ///
-        /// \p DoRewrite and \p RewriteSuffix are the command line options passed
-        /// to the tool.
-        std::string deletethis;
+        /// \p DoRewrite and \p RewriteSuffix are the command line options passed to the tool.
         MatchHandler(bool DoRewrite, const std::string& RewriteSuffix)
-            : FixItOptions(RewriteSuffix), DoRewrite(DoRewrite) {
-            deletethis = RewriteSuffix;
-        }
+            : FixItOptions(RewriteSuffix), DoRewrite(DoRewrite) {}
 
         virtual void run(const clang::ast_matchers::MatchFinder::MatchResult& Result) final;
         virtual void onStartOfTranslationUnit() final;

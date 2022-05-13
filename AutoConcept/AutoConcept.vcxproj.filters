@@ -18,7 +18,7 @@
     <ClCompile Include="AutoConcept.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Matchers.cpp">
+    <ClCompile Include="MatchersDeduced.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="CommandLine.cpp">

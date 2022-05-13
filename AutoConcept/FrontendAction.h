@@ -49,15 +49,6 @@
 namespace auto_concept {
 
     /// Creates an `ASTConsumer` that defines the matcher.
-    /*class Action : public clang::ASTFrontendAction {
-    public:
-        using ASTConsumerPointer = std::unique_ptr<clang::ASTConsumer>;
-
-        ASTConsumerPointer
-            CreateASTConsumer(clang::CompilerInstance&, llvm::StringRef) override {
-            return std::make_unique<Consumer>();
-        }
-    };*/
     class Action : public clang::ASTFrontendAction {
     public:
         using ASTConsumerPointer = std::unique_ptr<clang::ASTConsumer>;
