@@ -50,6 +50,7 @@ namespace auto_concept {
     using namespace clang::tooling;
     using namespace clang;
     using namespace llvm;
+    using namespace std;
 
     MatchHandler::RewriterPointer MatchHandler::createRewriter(clang::DiagnosticsEngine& DiagnosticsEngine,
         clang::ASTContext& Context) {
@@ -80,149 +81,77 @@ namespace auto_concept {
             m.second.dump(llvm::outs(), *Context);
             llvm::outs() << "Match end: " << m.first << "\n";
         }
-        if (const auto* fun = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("printAll")) {
-            llvm::outs() << "/// printall \n";
-            fun->dumpColor();
-            llvm::outs() << "/// printall end \n";
-        }
-        if (const auto* fun = Result.Nodes.getNodeAs<clang::TemplateSpecializationType>("speciT")) {
-            llvm::outs() << "/// speciT \n";
-            fun->dump();
-            llvm::outs() << "/// speciT end \n";
-        }
-        if (const auto* fun = Result.Nodes.getNodeAs<clang::VarDecl>("vari")) {
-            llvm::outs() << "/// vari \n";
-            fun->dump();
-            fun->printName(llvm::outs());
-            llvm::outs() << "\n";
-            auto type= fun->getType();
-            type.dump();
-            llvm::outs() << "/// vari end \n";
-        }
-        if (const auto* fun = Result.Nodes.getNodeAs<clang::TemplateTypeParmType>("vari2")) {
-            llvm::outs() << "/// vari2 \n";
-            fun->dump();
-            llvm::outs() << "/// vari2 end \n";
-            int h = 65;
-        }
 
-        if (const auto* fun = Result.Nodes.getNodeAs<clang::CallExpr>("interesting")) {
-            fun->dumpColor();
-            auto callee = fun->getCallee();
-            callee->dumpColor();
+        //matches[]
 
-            auto rettype=fun->getCallReturnType(*Context);
-            rettype->dump();
+        if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl rewrite")) {
+            matches[func->getID()].push_back(Result);
+            if (const auto* param = Result.Nodes.getNodeAs<clang::TemplateTypeParmDecl>("templateTypeParmDecl arithmetic")) {
 
-            const clang::Type* Ptr = rettype.getTypePtr();
+                const auto& funcDecl = func->getTemplatedDecl();
+                const std::string& paramName = param->getName().str();
 
-            const clang::DependentNameType* DnPtr =
-                static_cast<const clang::DependentNameType*>(Ptr);
+                FullSourceLoc FullLocation = Context->getFullLoc(funcDecl->getBeginLoc());
+                FullLocation.getColumnNumber();
+                SourceLocation s = funcDecl->getBeginLoc();
+               
+                auto& DiagnosticsEngine = Context->getDiagnostics();
+                RewriterPointer Rewriter;
+                if (DoRewrite) Rewriter = createRewriter(DiagnosticsEngine, *Context);
 
-            DnPtr->dump();
+                // ToDo: \t....
+                auto FixIt = FixItHint::CreateInsertion(funcDecl->getBeginLoc(), "requires std::is_arithmetic_v<" + paramName + ">\n\t");
+                auto& diag = Context->getDiagnostics();
+                const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Please rename this");
+                diag.Report(funcDecl->getBeginLoc(), diagID).AddFixItHint(FixIt);
 
-            auto dep=DnPtr->getDependence();
-
-
-            auto chi2=fun->child_begin();
-            chi2->dump();
-            auto chi3 = *chi2;
-            auto name = chi3->getStmtClassName();
-
-           
-            chi3->PrintStats();
-            DependentScopeDeclRefExpr* asdf = (DependentScopeDeclRefExpr*)(void*)chi3;
-            //DependentScopeDeclRefExpr 
-            asdf->dump();
-            auto decln= asdf->getDeclName();
-            decln.dump();
-            auto depp= asdf->getDependence();
-
-            
-
-            clang::TemplateArgumentListInfo li;
-            asdf->copyTemplateArgumentsInto(li);
-            
-            auto asdfff = asdf->getNumTemplateArgs();
-            auto asdfff2 = asdf->getNameInfo();
-            auto asdfff3 = asdf->getQualifier();
-            auto asdfff4 = asdf->getExprStmt();
-            auto asdfff5 = asdf->getType(); 
-            ;
-
-            asdfff4->PrintStats();
-            auto stt2= asdfff2.getAsString();
-            asdfff3->dump();
-            asdfff4->dump();
-            asdfff5->dump();
-
-            auto typp = asdfff4->getType();
-
-            typp.dump();
-
-            auto leccc= typp->getAs<TemplateSpecializationType>();
-
-
-
-            /*
-            const IdentifierInfo* IdInfo = DnPtr->getIdentifier();
-            const NestedNameSpecifier* Specifier = DnPtr->getQualifier();
-            const Type* DependentTy = Specifier->getAsType();
-            const TemplateTypeParmType* ParmTy = DependentTy->getAs<TemplateTypeParmType>();
-
-
-            //const clang::NestedNameSpecifier* Nns = DnPtr->getQualifier();
-            const clang::Type* NestedPtr = Ptr;
-            const clang::TemplateSpecializationType* TsPtr =static_cast<const clang::TemplateSpecializationType*>(NestedPtr);
-            auto Temp = TsPtr->getTemplateName();
-            auto temp2= Temp.getAsTemplateDecl();
-
-            Temp.dump();
-            //temp2->dump();
-            
-            //DnPtr->dump();
-
-            //auto keyw= DnPtr->getKeywordName(DnPtr->getKeyword());
-            auto ide = DnPtr->getIdentifier();
-            
-            auto qual = DnPtr->getQualifier();
-            //qual->dump();
-
-            auto desug = DnPtr->desugar();
-            desug.dump();
-
-
-            int h = 3;*/
-        }
-
-        if (const auto* fun = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("function-to-autoconcept")) {
-            const auto& body = fun->getAsFunction()->getBody();
-            llvm::outs() << "body pointer: " << body << "\n";
-            FullSourceLoc FullLocation = Context->getFullLoc(fun->getBeginLoc());
-            llvm::outs() << "Found function-to-autoconcept at " << FullLocation.getSpellingLineNumber() << ":"
-                << FullLocation.getSpellingColumnNumber() << "\n";
-
-            auto& DiagnosticsEngine = Context->getDiagnostics();
-            RewriterPointer Rewriter;
-            if (DoRewrite) {
-                Rewriter = createRewriter(DiagnosticsEngine, *Context);
-            }
-
-            auto FixIt = FixItHint::CreateReplacement(fun->getBeginLoc(), " olol ");
-            auto& DE = Context->getDiagnostics();
-            const auto ID = DE.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Please rename this");
-            DE.Report(fun->getBeginLoc(), ID).AddFixItHint(FixIt);
-
-            if (DoRewrite) {
-                assert(Rewriter != nullptr);
-
-                llvm::raw_ostream os();
-
-                //            Rewriter->WriteFixedFile(FullLocation.getFileID());
-                Rewriter->WriteFixedFiles();
+                if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
             }
         }
+       
 
+    }
+    void MatchHandler::onStartOfTranslationUnit() {
+        matches.clear();
+    }
+    void MatchHandler::onEndOfTranslationUnit() {      
+        for (auto& matchesPair : matches) {
+            auto firstMatch = *matchesPair.second.begin();
+            ASTContext* firstContext = firstMatch.Context;
+
+            if (const auto* func = firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl rewrite")) {
+                const auto& funcDecl = func->getTemplatedDecl();
+
+                FullSourceLoc FullLocation = firstContext->getFullLoc(funcDecl->getBeginLoc());
+                FullLocation.getColumnNumber();
+                SourceLocation s = funcDecl->getBeginLoc();
+
+                auto& DiagnosticsEngine = firstContext->getDiagnostics();
+                RewriterPointer Rewriter;
+                if (DoRewrite) Rewriter = createRewriter(DiagnosticsEngine, *firstContext);
+
+                string replaceText = "requires ";
+                for (int i = 0; auto & match : matchesPair.second) {
+                    if (const auto* param = firstMatch.Nodes.getNodeAs<clang::TemplateTypeParmDecl>("templateTypeParmDecl arithmetic")) {
+                        const std::string& paramName = param->getName().str();
+                        if (i++ != 0) replaceText += "&& ";
+                        replaceText += "std::is_arithmetic_v<" + paramName + "> ";
+                    }
+                }
+                
+                // ToDo: \t....
+                auto FixIt = FixItHint::CreateInsertion(funcDecl->getBeginLoc(), replaceText + ">\n\t");
+                auto& diag = firstContext->getDiagnostics();
+                const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Consider adding concept to function {0}");
+                auto builder = diag.Report(funcDecl->getBeginLoc(), diagID);
+                builder.AddString(func->getQualifiedNameAsString());
+                builder.AddFixItHint(FixIt);
+
+                if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
+            }
+
+            
+        }
     }
 
 }

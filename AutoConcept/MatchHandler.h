@@ -40,7 +40,7 @@
 #include <memory>
 #include <string>
 #include <type_traits>
-
+#include <unordered_map>
 #include <iostream>
 #include <concepts>
 
@@ -52,6 +52,7 @@ namespace auto_concept {
         using MatchResult = clang::ast_matchers::MatchFinder::MatchResult;
         using RewriterPointer = std::unique_ptr<clang::FixItRewriter>;
         FixItRewriterOptions FixItOptions;
+        std::unordered_map< int64_t, clang::SmallVector<MatchResult> > matches;
         bool DoRewrite;
         /// Allocates a \c FixItRewriter and sets it as the client of the given \p
         /// DiagnosticsEngine.
@@ -68,7 +69,11 @@ namespace auto_concept {
             : FixItOptions(RewriteSuffix), DoRewrite(DoRewrite) {
             deletethis = RewriteSuffix;
         }
-        virtual void run(const clang::ast_matchers::MatchFinder::MatchResult& Result);
+
+        virtual void run(const clang::ast_matchers::MatchFinder::MatchResult& Result) final;
+        virtual void onStartOfTranslationUnit() final;
+        virtual void onEndOfTranslationUnit() final;
+
     };
 
 }

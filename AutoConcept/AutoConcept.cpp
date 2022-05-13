@@ -122,7 +122,7 @@ namespace auto_concept {
         // Todo: a less ugly version
         if (auto FixedVirtualFile = Tool.getFiles().getVirtualFileSystem().openFileForRead(testFileOut)) {
             if (auto FixedVirtualFileBuffer = FixedVirtualFile.get().get()->getBuffer(testFileOut)) {
-                FixedVirtualFileBuffer.get().get()->getBuffer().str();
+                virtualFile = FixedVirtualFileBuffer.get().get()->getBuffer().str();
             }
         }
 

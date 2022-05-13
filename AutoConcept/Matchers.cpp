@@ -17,27 +17,8 @@
 
         vector<DeclarationMatcher> GetMatchers(){
 
-            // Don't change the name matcher and use push_back
+            // Don't change matchers
             vector<DeclarationMatcher> matchers;
-
-            /*
-            matchers .push_back(
-                functionTemplateDecl(isExpansionInMainFile(), has(functionDecl(forEachDescendant(callExpr().bind("interesting"))))).bind("printAll")
-
-            );
-            //elaboratedType
-            matchers .push_back(
-                varDecl(isExpansionInMainFile(), hasDescendant( templateTypeParmType().bind("vari2") )).bind("vari")
-            );
-
-            matchers .push_back(
-                functionTemplateDecl(isExpansionInMainFile(), has(functionDecl(has(compoundStmt(has(declStmt(has( varDecl().bind("vari"))))))))).bind("printAll")
-
-            );
-
-            matchers .push_back(
-                functionTemplateDecl(isExpansionInMainFile(), hasDescendant(templateTypeParmType().bind("vari2"))).bind("printAll")
-            );*/
 
             matchers.push_back(
                 functionTemplateDecl(
@@ -60,11 +41,8 @@
                     forEach(templateTypeParmDecl(
                         equalsBoundNode("templateTypeParmDecl arithmetic")
                     ))
-                ).bind("functionTemplateDecl")
+                ).bind("functionTemplateDecl rewrite")
             );
-            /*matchers.push_back(
-                varDecl(isExpansionInMainFile(), hasDescendant(templateTypeParmType().bind("vari2"))).bind("vari")
-            );*/
 
 
             return matchers;
