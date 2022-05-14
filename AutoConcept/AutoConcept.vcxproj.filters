@@ -30,6 +30,9 @@
     <ClCompile Include="Consumer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MatchersGuessed.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoConcept.h">

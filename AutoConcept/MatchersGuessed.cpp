@@ -15,34 +15,34 @@
         using namespace std;
         using namespace clang::ast_matchers;
 
-        vector<DeclarationMatcher> GetMatchersDeduced(){
+        vector<DeclarationMatcher> GetMatchersGuessed() {
 
             // Don't change matchers
             vector<DeclarationMatcher> matchers;
 
-            matchers.push_back(
+            /*matchers.push_back(
                 functionTemplateDecl(
-                    isExpansionInMainFile(), 
-                    forEachDescendant( varDecl( 
-                        hasDescendant( templateSpecializationType(
-                            hasDeclaration( 
+                    isExpansionInMainFile(),
+                    forEachDescendant(varDecl(
+                        hasDescendant(templateSpecializationType(
+                            hasDeclaration(
                                 classTemplateDecl(
                                     hasName("numeric_limits"),
                                     isInStdNamespace()
                                 )
                             )
                         )),
-                        hasDescendant( templateTypeParmType(
+                        hasDescendant(templateTypeParmType(
                             hasDeclaration(
-                                templateTypeParmDecl().bind("templateTypeParmDecl arithmetic")
+                                templateTypeParmDecl().bind("templateTypeParmDecl2 arithmetic")
                             )
                         ))
                     )),
                     forEach(templateTypeParmDecl(
-                        equalsBoundNode("templateTypeParmDecl arithmetic")
+                        equalsBoundNode("templateTypeParmDecl2 arithmetic")
                     ))
-                ).bind("functionTemplateDecl rewrite")
-            );
+                ).bind("functionTemplateDecl2 rewrite")
+            );*/
 
 
             return matchers;

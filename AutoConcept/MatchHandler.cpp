@@ -121,7 +121,7 @@ namespace auto_concept {
                 // ToDo: \t....
                 auto FixIt = FixItHint::CreateInsertion(funcDecl->getBeginLoc(), replaceText + "\n\t");
                 auto& diag = firstContext->getDiagnostics();
-                const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Consider adding concept to template(s): %0");
+                const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Consider adding concepts to template(s): %0");
                 // So we destroy our builder to execute it..
                 {
                     const auto& builder = diag.Report(func->getBeginLoc(), diagID);
