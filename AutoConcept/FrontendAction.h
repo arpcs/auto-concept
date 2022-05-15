@@ -43,6 +43,7 @@
 
 #include <iostream>
 #include <concepts>
+#include <functional>
 
 #include "CommandLine.h"
 
@@ -52,19 +53,26 @@ namespace auto_concept {
     class Action : public clang::ASTFrontendAction {
     public:
         using ASTConsumerPointer = std::unique_ptr<clang::ASTConsumer>;
+        using MatchFinder = clang::ast_matchers::MatchFinder;
 
         /// Constructor, taking the \p RewriteOption and \p RewriteSuffixOption.
-        Action(bool DoRewrite, const std::string& RewriteSuffix)
-            : DoRewrite(DoRewrite), RewriteSuffix(RewriteSuffix) {
+        Action(bool DoRewrite, const std::string& RewriteSuffix, 
+            std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher,
+            std::function<void(const MatchFinder::MatchResult&)> customMatchHandler)
+            : DoRewrite(DoRewrite), RewriteSuffix(RewriteSuffix), customMatcher(customMatcher), customMatchHandler(customMatchHandler) {
         }
 
         /// Creates the Consumer instance, forwarding the command line options.
         ASTConsumerPointer CreateASTConsumer(clang::CompilerInstance& Compiler,
             llvm::StringRef Filename) override {
-            return std::make_unique<Consumer>(DoRewrite, RewriteSuffix);
+            return std::make_unique<Consumer>(DoRewrite, RewriteSuffix, customMatcher, customMatchHandler);
         }
 
     private:
+        // Custom mather and handler for convenience
+        std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher;
+        std::function<void(const MatchFinder::MatchResult&)> customMatchHandler;
+
         /// Whether we want to rewrite files. Forwarded to the consumer.
         bool DoRewrite;
 
@@ -75,8 +83,11 @@ namespace auto_concept {
     /// A custom \c FrontendActionFactory so that we can pass the options
     /// to the constructor of the tool.
     struct ToolFactory : public clang::tooling::FrontendActionFactory {
+        using MatchFinder = clang::ast_matchers::MatchFinder;
+        std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher;
+        std::function<void(const MatchFinder::MatchResult&)> customMatchHandler;
         std::unique_ptr<clang::FrontendAction> create() override {
-            return std::make_unique<auto_concept::Action>(CLOptions::RewriteOption, CLOptions::RewriteSuffixOption);
+            return std::make_unique<auto_concept::Action>(CLOptions::RewriteOption, CLOptions::RewriteSuffixOption, customMatcher, customMatchHandler);
         }
     };
 

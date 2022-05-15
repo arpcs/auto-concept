@@ -43,24 +43,30 @@
 #include <unordered_map>
 #include <iostream>
 #include <concepts>
+#include <functional>
 
 #include "CommandLine.h"
 
 namespace auto_concept {
 
     class MatchHandler : public clang::ast_matchers::MatchFinder::MatchCallback {
-        using MatchResult = clang::ast_matchers::MatchFinder::MatchResult;
+        using MatchFinder = clang::ast_matchers::MatchFinder;
+        using MatchResult = MatchFinder::MatchResult;
         using RewriterPointer = std::unique_ptr<clang::FixItRewriter>;
         FixItRewriterOptions FixItOptions;
         std::unordered_map< int64_t, clang::SmallVector<MatchResult> > matches;
         bool DoRewrite;
+        std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher;
+        std::function<void(const MatchFinder::MatchResult&)> customMatchHandler;
         /// Allocates a \c FixItRewriter and sets it as the client of the given \p DiagnosticsEngine.
         /// The \p Context is forwarded to the constructor of the \c FixItRewriter.
         RewriterPointer createRewriter(clang::DiagnosticsEngine& DiagnosticsEngine, clang::ASTContext& Context);
     public:
         /// \p DoRewrite and \p RewriteSuffix are the command line options passed to the tool.
-        MatchHandler(bool DoRewrite, const std::string& RewriteSuffix)
-            : FixItOptions(RewriteSuffix), DoRewrite(DoRewrite) {}
+        MatchHandler(bool DoRewrite, const std::string& RewriteSuffix, 
+            std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher,
+            std::function<void(const MatchFinder::MatchResult&)> customMatchHandler)
+            : FixItOptions(RewriteSuffix), DoRewrite(DoRewrite), customMatcher(customMatcher), customMatchHandler(customMatchHandler) {}
 
         virtual void run(const clang::ast_matchers::MatchFinder::MatchResult& Result) final;
         virtual void onStartOfTranslationUnit() final;

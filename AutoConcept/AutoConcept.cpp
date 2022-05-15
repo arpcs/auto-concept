@@ -49,6 +49,7 @@
 #include "Consumer.h"
 #include "CommandLine.h"
 #include "FrontendAction.h"
+#include "ResourceTypes.h"
 
 namespace auto_concept {
 
@@ -80,16 +81,17 @@ namespace auto_concept {
         return Tool.run(factory.get());
     }
 
-    int RunAppTest(std::string& virtualFile) {
+    int RunAppOnVirtual(std::string& virtualFile) {
+        Resources res;
         // Prepare for testing
         int argc = 5;
-        const std::string testFileIn = "virtualTestFile.cpp";
-        const std::string testSuffix = "test.cpp";
-        const std::string testFileOut = testFileIn + testSuffix;
-        const std::string suffixRewriteArg = "-rewrite-suffix=" + testSuffix;
-        const char* argv[] = { "AutoConceptTest", testFileIn.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--" };
+        const std::string virtualFileIn = "VirtualInFile.cpp";
+        const std::string virtualSuffix = "VirtualOut.cpp";
+        const std::string virtualFileOut = virtualFileIn + virtualSuffix;
+        const std::string suffixRewriteArg = "-rewrite-suffix=" + virtualSuffix;
+        const char* argv[] = { "AutoConceptTest", virtualFileIn.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--" };
 
-        if (std::filesystem::exists(testFileOut)) std::filesystem::remove(testFileOut);
+        if (std::filesystem::exists(virtualFileOut)) std::filesystem::remove(virtualFileOut);
 
         auto ExpectedParser = CommonOptionsParser::create(argc, argv, CLOptions::MyToolCategory);
         if (!ExpectedParser) {
@@ -107,13 +109,13 @@ namespace auto_concept {
         );
 
         // Map the string reference to a virtual file when testing
-        Tool.mapVirtualFile(testFileIn, virtualFile);
+        Tool.mapVirtualFile(virtualFileIn, virtualFile);
 
         auto factory = std::make_unique<ToolFactory>();
         auto result = Tool.run(factory.get());
 
-        if (auto FixedVirtualFile = Tool.getFiles().getVirtualFileSystem().openFileForRead(testFileOut)) {
-            if (auto FixedVirtualFileBuffer = FixedVirtualFile.get().get()->getBuffer(testFileOut)) {
+        if (auto FixedVirtualFile = Tool.getFiles().getVirtualFileSystem().openFileForRead(virtualFileOut)) {
+            if (auto FixedVirtualFileBuffer = FixedVirtualFile.get().get()->getBuffer(virtualFileOut)) {
                 virtualFile = FixedVirtualFileBuffer.get().get()->getBuffer().str();
             }
         }

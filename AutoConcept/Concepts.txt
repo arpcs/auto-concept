@@ -1,0 +1,142 @@
+CONCEPT NAME	DESCRIPTION	# ARGUMENTS	INCLUDES 	EXPOSITION ONLY	CPP20 STD	IS CONCEPT	PASSING TYPES …
+same_as	specifies that a type is the same as another type		concepts	FALSE	TRUE	TRUE	
+derived_from	specifies that a type is derived from another type		concepts	FALSE	TRUE	TRUE	
+convertible_to	specifies that a type is implicitly convertible to another type		concepts	FALSE	TRUE	TRUE	
+common_reference_with	specifies that two types share a common reference type		concepts	FALSE	TRUE	TRUE	
+common_with	specifies that two types share a common type		concepts	FALSE	TRUE	TRUE	
+integral	specifies that a type is an integral type		concepts	FALSE	TRUE	TRUE	
+signed_integral	specifies that a type is an integral type that is signed		concepts	FALSE	TRUE	TRUE	
+unsigned_integral	specifies that a type is an integral type that is unsigned		concepts	FALSE	TRUE	TRUE	
+floating_point	specifies that a type is a floating-point type		concepts	FALSE	TRUE	TRUE	
+assignable_from	specifies that a type is assignable from another type		concepts	FALSE	TRUE	TRUE	
+swappableswappable_with	specifies that a type can be swapped or that two types can be swapped with each other		concepts	FALSE	TRUE	TRUE	
+destructible	specifies that an object of the type can be destroyed		concepts	FALSE	TRUE	TRUE	
+constructible_from	specifies that a variable of the type can be constructed from or bound to a set of argument types		concepts	FALSE	TRUE	TRUE	
+default_initializable	specifies that an object of a type can be default constructed		concepts	FALSE	TRUE	TRUE	
+move_constructible	specifies that an object of a type can be move constructed		concepts	FALSE	TRUE	TRUE	
+copy_constructible	specifies that an object of a type can be copy constructed and move constructed		concepts	FALSE	TRUE	TRUE	
+boolean-testable	specifies that a type can be used in Boolean contexts		concepts	TRUE	TRUE	TRUE	
+equality_comparableequality_comparable_with	specifies that operator == is an equivalence relation		concepts	FALSE	TRUE	TRUE	
+totally_orderedtotally_ordered_with	specifies that the comparison operators on the type yield a total order		concepts	FALSE	TRUE	TRUE	
+three_way_comparablethree_way_comparable_with	specifies that operator <=> produces consistent result on given types		concepts	FALSE	TRUE	TRUE	
+movable	specifies that an object of a type can be moved and swapped		concepts	FALSE	TRUE	TRUE	
+copyable	specifies that an object of a type can be copied, moved, and swapped		concepts	FALSE	TRUE	TRUE	
+semiregular	specifies that an object of a type can be copied, moved, swapped, and default constructed		concepts	FALSE	TRUE	TRUE	
+regular	specifies that a type is regular, that is, it is both semiregular and equality_comparable		concepts	FALSE	TRUE	TRUE	
+invocableregular_invocable	specifies that a callable type can be invoked with a given set of argument types		concepts	FALSE	TRUE	TRUE	
+predicate	specifies that a callable type is a Boolean predicate		concepts	FALSE	TRUE	TRUE	
+relation	specifies that a callable type is a binary relation		concepts	FALSE	TRUE	TRUE	
+equivalence_relation	specifies that a relation imposes an equivalence relation		concepts	FALSE	TRUE	TRUE	
+strict_weak_order	specifies that a relation imposes a strict weak ordering		concepts	FALSE	TRUE	TRUE	
+indirectly_readable	specifies that a type is indirectly readable by applying operator *		iterator	FALSE	TRUE	TRUE	
+indirectly_writable	specifies that a value can be written to an iterator's referenced object		iterator	FALSE	TRUE	TRUE	
+weakly_incrementable	specifies that a semiregular type can be incremented with pre- and post-increment operators		iterator	FALSE	TRUE	TRUE	
+incrementable	specifies that the increment operation on a weakly_incrementable type is equality-preserving and that the type is equality_comparable		iterator	FALSE	TRUE	TRUE	
+input_or_output_iterator	specifies that objects of a type can be incremented and dereferenced		iterator	FALSE	TRUE	TRUE	
+sentinel_for	specifies a type is a sentinel for an input_or_output_iterator type		iterator	FALSE	TRUE	TRUE	
+sized_sentinel_for	specifies that the - operator can be applied to an iterator and a sentinel to calculate their difference in constant time		iterator	FALSE	TRUE	TRUE	
+input_iterator	specifies that a type is an input iterator, that is, its referenced values can be read and it can be both pre- and post-incremented		iterator	FALSE	TRUE	TRUE	
+output_iterator	specifies that a type is an output iterator for a given value type, that is, values of that type can be written to it and it can be both pre- and post-incremented		iterator	FALSE	TRUE	TRUE	
+forward_iterator	specifies that an input_iterator is a forward iterator, supporting equality comparison and multi-pass		iterator	FALSE	TRUE	TRUE	
+bidirectional_iterator	specifies that a forward_iterator is a bidirectional iterator, supporting movement backwards		iterator	FALSE	TRUE	TRUE	
+random_access_iterator	specifies that a bidirectional_iterator is a random-access iterator, supporting advancement in constant time and subscripting		iterator	FALSE	TRUE	TRUE	
+contiguous_iterator	specifies that a random_access_iterator is a contiguous iterator, referring to elements that are contiguous in memory		iterator	FALSE	TRUE	TRUE	
+indirectly_unary_invocableindirectly_regular_unary_invocable	specifies that a callable type can be invoked with the result of dereferencing an indirectly_readable type		iterator	FALSE	TRUE	TRUE	
+indirect_unary_predicate	specifies that a callable type, when invoked with the result of dereferencing an indirectly_readable type, satisfies predicate		iterator	FALSE	TRUE	TRUE	
+indirect_binary_predicate	specifies that a callable type, when invoked with the result of dereferencing two indirectly_readable types, satisfies predicate		iterator	FALSE	TRUE	TRUE	
+indirect_equivalence_relation	specifies that a callable type, when invoked with the result of dereferencing two indirectly_readable types, satisfies equivalence_relation		iterator	FALSE	TRUE	TRUE	
+indirect_strict_weak_order	specifies that a callable type, when invoked with the result of dereferencing two indirectly_readable types, satisfies strict_weak_order		iterator	FALSE	TRUE	TRUE	
+indirectly_movable	specifies that values may be moved from an indirectly_readable type to an indirectly_writable type		iterator	FALSE	TRUE	TRUE	
+indirectly_movable_storable	specifies that values may be moved from an indirectly_readable type to an indirectly_writable type and that the move may be performed via an intermediate object		iterator	FALSE	TRUE	TRUE	
+indirectly_copyable	specifies that values may be copied from an indirectly_readable type to an indirectly_writable type		iterator	FALSE	TRUE	TRUE	
+indirectly_copyable_storable	specifies that values may be copied from an indirectly_readable type to an indirectly_writable type and that the copy may be performed via an intermediate object		iterator	FALSE	TRUE	TRUE	
+indirectly_swappable	specifies that the values referenced by two indirectly_readable types can be swapped		iterator	FALSE	TRUE	TRUE	
+indirectly_comparable	specifies that the values referenced by two indirectly_readable types can be compared		iterator	FALSE	TRUE	TRUE	
+permutable	specifies the common requirements of algorithms that reorder elements in place		iterator	FALSE	TRUE	TRUE	
+mergeable	specifies the requirements of algorithms that merge sorted sequences into an output sequence by copying elements		iterator	FALSE	TRUE	TRUE	
+sortable	specifies the common requirements of algorithms that permute sequences into ordered sequences		iterator	FALSE	TRUE	TRUE	
+ranges::range	specifies that a type is a range, that is, it provides a begin iterator and an end sentinel		ranges	FALSE	TRUE	TRUE	
+ranges::borrowed_range	specifies that a type is a range and iterators obtained from an expression of it can be safely returned without danger of dangling		ranges	FALSE	TRUE	TRUE	
+ranges::sized_range	specifies that a range knows its size in constant time		ranges	FALSE	TRUE	TRUE	
+ranges::view	specifies that a range is a view, that is, it has constant time copy/move/assignment		ranges	FALSE	TRUE	TRUE	
+ranges::input_range	specifies a range whose iterator type satisfies input_iterator		ranges	FALSE	TRUE	TRUE	
+ranges::output_range	specifies a range whose iterator type satisfies output_iterator		ranges	FALSE	TRUE	TRUE	
+ranges::forward_range	specifies a range whose iterator type satisfies forward_iterator		ranges	FALSE	TRUE	TRUE	
+ranges::bidirectional_range	specifies a range whose iterator type satisfies bidirectional_iterator		ranges	FALSE	TRUE	TRUE	
+ranges::random_access_range	specifies a range whose iterator type satisfies random_access_iterator		ranges	FALSE	TRUE	TRUE	
+ranges::contiguous_range	specifies a range whose iterator type satisfies contiguous_iterator		ranges	FALSE	TRUE	TRUE	
+ranges::common_range	specifies that a range has identical iterator and sentinel types		ranges	FALSE	TRUE	TRUE	
+ranges::viewable_range	specifies the requirements for a range to be safely convertible to a view		ranges	FALSE	TRUE	TRUE	
+is_void	checks if a type is void		type_traits	FALSE	TRUE	FALSE	
+is_null_pointer	checks if a type is std::nullptr_t		type_traits	FALSE	TRUE	FALSE	
+is_integral	checks if a type is an integral type		type_traits	FALSE	TRUE	FALSE	
+is_floating_point	checks if a type is a floating-point type		type_traits	FALSE	TRUE	FALSE	
+is_array	checks if a type is an array type		type_traits	FALSE	TRUE	FALSE	
+is_enum	checks if a type is an enumeration type		type_traits	FALSE	TRUE	FALSE	
+is_union	checks if a type is an union type		type_traits	FALSE	TRUE	FALSE	
+is_class	checks if a type is a non-union class type		type_traits	FALSE	TRUE	FALSE	
+is_function	checks if a type is a function type		type_traits	FALSE	TRUE	FALSE	
+is_pointer	checks if a type is a pointer type		type_traits	FALSE	TRUE	FALSE	
+is_lvalue_reference	checks if a type is a lvalue reference		type_traits	FALSE	TRUE	FALSE	
+is_rvalue_reference	checks if a type is a rvalue reference		type_traits	FALSE	TRUE	FALSE	
+is_member_object_pointer	checks if a type is a pointer to a non-static member object		type_traits	FALSE	TRUE	FALSE	
+is_member_function_pointer	checks if a type is a pointer to a non-static member function		type_traits	FALSE	TRUE	FALSE	
+is_fundamental	checks if a type is a fundamental type		type_traits	FALSE	TRUE	FALSE	
+is_arithmetic	checks if a type is an arithmetic type		type_traits	FALSE	TRUE	FALSE	
+is_scalar	checks if a type is a scalar type		type_traits	FALSE	TRUE	FALSE	
+is_object	checks if a type is an object type		type_traits	FALSE	TRUE	FALSE	
+is_compound	checks if a type is a compound type		type_traits	FALSE	TRUE	FALSE	
+is_reference	checks if a type is either a lvalue reference or rvalue reference		type_traits	FALSE	TRUE	FALSE	
+is_member_pointer	checks if a type is a pointer to an non-static member function or object		type_traits	FALSE	TRUE	FALSE	
+is_const	checks if a type is const-qualified		type_traits	FALSE	TRUE	FALSE	
+is_volatile	checks if a type is volatile-qualified		type_traits	FALSE	TRUE	FALSE	
+is_trivial	checks if a type is trivial		type_traits	FALSE	TRUE	FALSE	
+is_trivially_copyable	checks if a type is trivially copyable		type_traits	FALSE	TRUE	FALSE	
+is_standard_layout	checks if a type is a standard-layout type		type_traits	FALSE	TRUE	FALSE	
+has_unique_object_representations	checks if every bit in the type's object representation contributes to its value		type_traits	FALSE	TRUE	FALSE	
+is_empty	checks if a type is a class (but not union) type and has no non-static data members		type_traits	FALSE	TRUE	FALSE	
+is_polymorphic	checks if a type is a polymorphic class type		type_traits	FALSE	TRUE	FALSE	
+is_abstract	checks if a type is an abstract class type		type_traits	FALSE	TRUE	FALSE	
+is_final	checks if a type is a final class type		type_traits	FALSE	TRUE	FALSE	
+is_aggregate	checks if a type is an aggregate type		type_traits	FALSE	TRUE	FALSE	
+is_signed	checks if a type is a signed arithmetic type		type_traits	FALSE	TRUE	FALSE	
+is_unsigned	checks if a type is an unsigned arithmetic type		type_traits	FALSE	TRUE	FALSE	
+is_bounded_array	checks if a type is an array type of known bound		type_traits	FALSE	TRUE	FALSE	
+is_unbounded_array	checks if a type is an array type of unknown bound		type_traits	FALSE	TRUE	FALSE	
+is_constructible	checks if a type has a constructor for specific arguments		type_traits	FALSE	TRUE	FALSE	
+is_trivially_constructible	checks if a type has a constructor for specific arguments		type_traits	FALSE	TRUE	FALSE	
+is_nothrow_constructible	checks if a type has a constructor for specific arguments		type_traits	FALSE	TRUE	FALSE	
+is_default_constructible	checks if a type has a default constructor		type_traits	FALSE	TRUE	FALSE	
+is_trivially_default_constructible	checks if a type has a default constructor		type_traits	FALSE	TRUE	FALSE	
+is_nothrow_default_constructible	checks if a type has a default constructor		type_traits	FALSE	TRUE	FALSE	
+is_copy_constructible	checks if a type has a copy constructor		type_traits	FALSE	TRUE	FALSE	
+is_trivially_copy_constructible	checks if a type has a copy constructor		type_traits	FALSE	TRUE	FALSE	
+is_nothrow_copy_constructible	checks if a type has a copy constructor		type_traits	FALSE	TRUE	FALSE	
+is_move_constructible	checks if a type can be constructed from an rvalue reference		type_traits	FALSE	TRUE	FALSE	
+is_trivially_move_constructible	checks if a type can be constructed from an rvalue reference		type_traits	FALSE	TRUE	FALSE	
+is_nothrow_move_constructible	checks if a type can be constructed from an rvalue reference		type_traits	FALSE	TRUE	FALSE	
+is_assignable	checks if a type has a assignment operator for a specific argument		type_traits	FALSE	TRUE	FALSE	
+is_trivially_assignable	checks if a type has a assignment operator for a specific argument		type_traits	FALSE	TRUE	FALSE	
+is_nothrow_assignable	checks if a type has a assignment operator for a specific argument		type_traits	FALSE	TRUE	FALSE	
+is_copy_assignable	checks if a type has a copy assignment operator		type_traits	FALSE	TRUE	FALSE	
+is_trivially_copy_assignable	checks if a type has a copy assignment operator		type_traits	FALSE	TRUE	FALSE	
+is_nothrow_copy_assignable	checks if a type has a copy assignment operator		type_traits	FALSE	TRUE	FALSE	
+is_move_assignable	checks if a type has a move assignment operator		type_traits	FALSE	TRUE	FALSE	
+is_trivially_move_assignable	checks if a type has a move assignment operator		type_traits	FALSE	TRUE	FALSE	
+is_nothrow_move_assignable	checks if a type has a move assignment operator		type_traits	FALSE	TRUE	FALSE	
+is_destructible	checks if a type has a non-deleted destructor		type_traits	FALSE	TRUE	FALSE	
+is_trivially_destructible	checks if a type has a non-deleted destructor		type_traits	FALSE	TRUE	FALSE	
+is_nothrow_destructible	checks if a type has a non-deleted destructor		type_traits	FALSE	TRUE	FALSE	
+has_virtual_destructor	checks if a type has a virtual destructor		type_traits	FALSE	TRUE	FALSE	
+is_swappable_with	checks if objects of a type can be swapped with objects of same or different type		type_traits	FALSE	TRUE	FALSE	
+is_swappable	checks if objects of a type can be swapped with objects of same or different type		type_traits	FALSE	TRUE	FALSE	
+is_nothrow_swappable_with	checks if objects of a type can be swapped with objects of same or different type		type_traits	FALSE	TRUE	FALSE	
+is_nothrow_swappable	checks if objects of a type can be swapped with objects of same or different type		type_traits	FALSE	TRUE	FALSE	
+is_same	checks if two types are the same		type_traits	FALSE	TRUE	FALSE	
+is_base_of	checks if a type is derived from the other type		type_traits	FALSE	TRUE	FALSE	
+is_convertibleis_nothrow_convertible	checks if a type can be converted to the other type		type_traits	FALSE	TRUE	FALSE	
+is_invocableis_invocable_ris_nothrow_invocableis_nothrow_invocable_r	checks if a type can be invoked (as if by std::invoke) with the given argument types		type_traits	FALSE	TRUE	FALSE	
+is_layout_compatible	checks if two types are layout-compatible		type_traits	FALSE	TRUE	FALSE	
+is_pointer_interconvertible_base_of	checks if a type is a pointer-interconvertible (initial) base of another type		type_traits	FALSE	TRUE	FALSE	
+is_pointer_interconvertible_with_class	checks if objects of a type are pointer-interconvertible with the specified subobject of that type		type_traits	FALSE	TRUE	FALSE	
+is_corresponding_member	checks if two specified members correspond to each other in the common initial subsequence of two specified types		type_traits	FALSE	TRUE	FALSE	

@@ -374,6 +374,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseFast|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="MatchHandler.cpp" />
+    <ClCompile Include="BasicResourceGenerators.cpp" />
+    <ClCompile Include="ResourceTypes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoConcept.h" />
@@ -382,6 +384,12 @@
     <ClInclude Include="Matchers.h" />
     <ClInclude Include="MatchHandler.h" />
     <ClInclude Include="CommandLine.h" />
+    <ClInclude Include="BasicResourceGenerators.h" />
+    <ClInclude Include="ResourceTypes.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Concepts.txt" />
+    <Text Include="Types.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

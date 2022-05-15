@@ -1,0 +1,22 @@
+TYPE OF INTEREST	includes	CPP20 STD
+void		TRUE
+bool		TRUE
+char		TRUE
+char*		TRUE
+short		TRUE
+int		TRUE
+int*		TRUE
+long long		TRUE
+long long*		TRUE
+unsigned char		TRUE
+unsigned char*		TRUE
+unsigned short		TRUE
+unsigned int		TRUE
+unsigned int*		TRUE
+unsigned long long		TRUE
+unsigned long long*		TRUE
+string	string	TRUE
+vector	vector	TRUE
+list	list	TRUE
+map	map	TRUE
+unordered_map	unordered_map	TRUE
