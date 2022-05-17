@@ -37,9 +37,9 @@ public:
 	void Step(int step) {
 		if (!started) return;
 		currentSteps+= step;
-		while (currentSteps * 100 / numberOfSteps >= lastProgress + percentageSkip) {
+		while ((currentSteps * 100 / numberOfSteps >= lastProgress + percentageSkip) && lastProgress+ percentageSkip <100) {
 			if (lastProgress / 10 != (lastProgress + percentageSkip) / 10 || lastProgress < 0) {
-				llvm::outs() << ((currentSteps * 100 / numberOfSteps) / 10);
+				llvm::outs() << (lastProgress + percentageSkip) / 10;
 			}
 			else {
 				llvm::outs() << '.';

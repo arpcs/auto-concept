@@ -14,6 +14,7 @@ namespace auto_concept {
 	class Types {
 	public:
 		Types(std::string_view line);
+		std::string toStr();
 		std::string name;
 		std::string include;
 		bool cpp20std = false;
@@ -22,6 +23,8 @@ namespace auto_concept {
 	class Concepts {
 	public:
 		Concepts(std::string_view line);
+		std::string toStr();
+
 		std::string name;
 		std::string description;
 		int numberOfArguments = 0;
@@ -38,6 +41,10 @@ namespace auto_concept {
 	public:
 		//ResourceState resourceState;
 		Resources(std::string_view typesFilename = "Types.txt", std::string_view conceptsFilename = "Concepts.txt");
+		void Save(std::string_view typesFilename = "Types.txt", std::string_view conceptsFilename = "Concepts.txt");
+
+		std::string typesFirstRow, conceptsFirstRow;
+
 		std::vector<Types> types;
 		std::vector<Concepts> concepts;
 	};

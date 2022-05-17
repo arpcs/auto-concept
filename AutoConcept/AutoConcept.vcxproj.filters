@@ -100,5 +100,11 @@
     <Text Include="Types.txt">
       <Filter>Resource Generator</Filter>
     </Text>
+    <Text Include="ConceptsBase.txt">
+      <Filter>Resource Generator</Filter>
+    </Text>
+    <Text Include="TypesBase.txt">
+      <Filter>Resource Generator</Filter>
+    </Text>
   </ItemGroup>
 </Project>
