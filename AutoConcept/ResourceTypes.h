@@ -26,7 +26,7 @@ namespace auto_concept {
 		std::string description;
 		int numberOfArguments = 0;
 		std::string include;
-		bool expositionOnly = false;
+		bool found = false;
 		bool cpp20std = false;
 		bool isConcept = false;
 		std::vector<std::string> specializations;

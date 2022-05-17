@@ -55,7 +55,7 @@ namespace auto_concept {
 		}
 		tabLoc = line.find('\t', startLoc);
 		if (tabLoc != string::npos) {
-			this->expositionOnly = (line.substr(startLoc, tabLoc - startLoc) == "TRUE");
+			this->found = (line.substr(startLoc, tabLoc - startLoc) == "TRUE");
 			startLoc = tabLoc + 1;
 		}
 		tabLoc = line.find('\t', startLoc);

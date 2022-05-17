@@ -363,6 +363,7 @@
       <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='ReleaseFast|x64'">false</MinimalRebuild>
     </ClCompile>
     <ClCompile Include="CommandLine.cpp" />
+    <ClCompile Include="ConsoleHelpers.cpp" />
     <ClCompile Include="Consumer.cpp" />
     <ClCompile Include="MatchersDeduced.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseFast|x64'">true</ExcludedFromBuild>
@@ -379,6 +380,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoConcept.h" />
+    <ClInclude Include="ConsoleHelpers.h" />
     <ClInclude Include="Consumer.h" />
     <ClInclude Include="FrontendAction.h" />
     <ClInclude Include="Matchers.h" />

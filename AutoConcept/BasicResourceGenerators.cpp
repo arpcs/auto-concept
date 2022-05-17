@@ -12,6 +12,9 @@
 
 #include <clang/ASTMatchers/ASTMatchers.h>
 #include <clang/ASTMatchers/ASTMatchFinder.h>
+#include <algorithm> 
+
+#include "ConsoleHelpers.h"
 
 namespace auto_concept {
     using namespace llvm;
@@ -20,74 +23,66 @@ namespace auto_concept {
     using namespace std;
 
     void FillNumberOfConceptArguments(Resources& resources) {
+
         string input = R"(
             #include <concepts>
             #include <type_traits>
             #include <ranges>
             #include <iterator>)";
-        
+
+        ProgressBar conceptProgressBar("Filling basic concept parameters", 
+            std::count_if(resources.concepts.begin(), resources.concepts.end(), [](Concepts& r) { return r.isConcept; }));
         unordered_map<string, int> conceptNames;
         {
             int i = 0;
             for (const auto& conceptRow : resources.concepts) conceptNames[conceptRow.name] = i++;
         }
+        for (auto& conceptRow : resources.concepts) conceptRow.found = false;
 
         RunAppOnVirtual(input,
             [&]() { return decl().bind("decl"); },
             [&](const MatchFinder::MatchResult& result) {
                 if (const auto* conceptDec = result.Nodes.getNodeAs<clang::ConceptDecl>("decl")) {
-                    auto conceptName = conceptDec->getDeclName().getAsString();
-                    auto conceptLoc = conceptNames.find(conceptName);
+                    auto nodeName = conceptDec->getDeclName().getAsString();
+                    auto conceptLoc = conceptNames.find(nodeName);
                     if (conceptLoc != conceptNames.end()) {
                         auto tParams= conceptDec->getTemplateParameters();
                         resources.concepts[conceptLoc->second].numberOfArguments = tParams->getMinRequiredArguments();
+                        resources.concepts[conceptLoc->second].found = true;
+                        conceptProgressBar.Tick();
                     }
                 }
             }
         );
-        RunAppOnVirtual(input,
-            [&]() { return decl( optionally(forEach(varDecl( has( cxxBoolLiteral().bind("lol")) ))) ,has(templateTypeParmDecl()), has(varDecl(isConstexpr(), hasType(booleanType())))).bind("varTemp"); },
-            [&](const MatchFinder::MatchResult& result) {
-                if (const auto* conceptDec = result.Nodes.getNodeAs<clang::VarTemplateDecl>("varTemp")) {
-                    auto conceptName = conceptDec->getDeclName().getAsString();
-                    auto conceptLoc = conceptNames.find(conceptName);
-                    if (conceptLoc == conceptNames.end() && conceptName.ends_with("_v")) conceptLoc = conceptNames.find(conceptName.substr(0, conceptName.size() - 2));
-                    if (conceptLoc != conceptNames.end()) {
-                        if (conceptName == "is_array_v") {
-                            conceptDec->dumpColor();
-                            //auto tParams = conceptDec->getTemplateParameters()->getMinRequiredArguments();
-                        }
-                        auto specs = conceptDec->specializations();
-                        for (auto spec : specs)
-                        {
-                            auto loool = spec->getInit();
-                            auto typp = loool->getType();
-                            auto typp2= loool->getType().getAsString();
+        conceptProgressBar.End();
 
-                            auto typpk = *(spec->getDescribedVarTemplate()->getTemplateParameters()->begin());
-                            auto tasdf = typpk->getDeclName().getAsString();
-                       
-                            auto tryy3 = static_cast<clang::CXXBoolLiteralExpr*>(loool);
-                            //auto tryy3 = typp->getAs<clang::CXXBoolLiteralExpr>();
-                            auto tryy4 = tryy3->getValue();
-                            int h = 5;
-                        }
-                        if (const auto* conceptDec = result.Nodes.getNodeAs<clang::CXXBoolLiteralExpr>("lol")) {
-                            auto map = result.Nodes.getMap();
-                            auto value = conceptDec->getValue();
-                            int i = 3;
-                        }
-                        //conceptDec->dumpColor();
+        ProgressBar templateProgressBar("Filling basic template predictate parameters",
+            std::count_if(resources.concepts.begin(), resources.concepts.end(), [](Concepts& r) { return !r.isConcept; }));
+        RunAppOnVirtual(input,
+            [&]() { return decl( has(templateTypeParmDecl()), has(varDecl(isConstexpr(), hasType(booleanType())))).bind("varTempDec"); },
+            [&](const MatchFinder::MatchResult& result) {
+                if (const auto* conceptDec = result.Nodes.getNodeAs<clang::VarTemplateDecl>("varTempDec")) {
+                    auto nodeName = conceptDec->getDeclName().getAsString();
+                    auto conceptLoc = conceptNames.find(nodeName);
+                    if (conceptLoc == conceptNames.end() && nodeName.ends_with("_v")) conceptLoc = conceptNames.find(nodeName.substr(0, nodeName.size() - 2));
+                    if (conceptLoc != conceptNames.end()) {
                         auto tParams = conceptDec->getTemplateParameters();
                         resources.concepts[conceptLoc->second].numberOfArguments = tParams->getMinRequiredArguments();
-                        //int h = 54;
+                        resources.concepts[conceptLoc->second].name = nodeName;
+                        resources.concepts[conceptLoc->second].found = true;
+                        templateProgressBar.Tick();
                     }
                 }
             }
         );
+        templateProgressBar.End();
+
         for (const auto& conceptRow : resources.concepts) {
-            if (conceptRow.numberOfArguments == 0 || conceptRow.numberOfArguments > 3) {
-                int h = 2;
+            if (!conceptRow.found) {
+                llvm::errs() << "Concept or template predictate not found: " << conceptRow.name << "\n";
+            }
+            else if (conceptRow.numberOfArguments == 0 || conceptRow.numberOfArguments > 3) {
+                llvm::errs() << "Concept or template predictate with few or too many number of required arguments: " << conceptRow.name << " : " << conceptRow.numberOfArguments << "\n";
             }
         }
         int h = 54;

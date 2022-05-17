@@ -25,6 +25,15 @@
     <Filter Include="Resource Generator\Source Files">
       <UniqueIdentifier>{adec6548-fc6c-4bc5-ab3b-43373ee71916}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Helpers">
+      <UniqueIdentifier>{bbc596a6-9717-4862-99cb-710937f1471f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers\Source Files">
+      <UniqueIdentifier>{273f289f-45ee-4a0c-b304-918189ee6447}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers\Header Files">
+      <UniqueIdentifier>{d15ec161-9c9f-4382-a590-a52b2eca9c4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AutoConcept.cpp">
@@ -51,6 +60,9 @@
     <ClCompile Include="BasicResourceGenerators.cpp">
       <Filter>Resource Generator\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ConsoleHelpers.cpp">
+      <Filter>Helpers\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoConcept.h">
@@ -76,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="BasicResourceGenerators.h">
       <Filter>Resource Generator\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleHelpers.h">
+      <Filter>Helpers\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
