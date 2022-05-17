@@ -4,6 +4,6 @@
 
 namespace auto_concept {
 
-	
+	void FillMissingResources(Resources& resources);
 
 }

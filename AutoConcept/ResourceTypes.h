@@ -5,6 +5,12 @@
 #include <vector>
 
 namespace auto_concept {
+
+	/*struct ResourceState {
+		bool typesGood = false;
+		bool conceptsGood = false;
+	};*/
+
 	class Types {
 	public:
 		Types(std::string_view line);
@@ -23,16 +29,14 @@ namespace auto_concept {
 		bool expositionOnly = false;
 		bool cpp20std = false;
 		bool isConcept = false;
+		std::vector<std::string> specializations;
 		std::vector<std::string> passingTypes;
-	};
-
-	struct ResourceState {
-		bool haveTypes = false;
 	};
 
 	// Main resource handler
 	class Resources {
 	public:
+		//ResourceState resourceState;
 		Resources(std::string_view typesFilename = "Types.txt", std::string_view conceptsFilename = "Concepts.txt");
 		std::vector<Types> types;
 		std::vector<Concepts> concepts;
@@ -40,3 +44,4 @@ namespace auto_concept {
 
 
 }
+

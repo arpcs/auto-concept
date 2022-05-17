@@ -48,7 +48,7 @@
 #include "CommandLine.h"
 
 namespace auto_concept {
-
+    class Consumer;
     class MatchHandler : public clang::ast_matchers::MatchFinder::MatchCallback {
         using MatchFinder = clang::ast_matchers::MatchFinder;
         using MatchResult = MatchFinder::MatchResult;
@@ -58,6 +58,8 @@ namespace auto_concept {
         bool DoRewrite;
         std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher;
         std::function<void(const MatchFinder::MatchResult&)> customMatchHandler;
+
+        friend Consumer;
         /// Allocates a \c FixItRewriter and sets it as the client of the given \p DiagnosticsEngine.
         /// The \p Context is forwarded to the constructor of the \c FixItRewriter.
         RewriterPointer createRewriter(clang::DiagnosticsEngine& DiagnosticsEngine, clang::ASTContext& Context);

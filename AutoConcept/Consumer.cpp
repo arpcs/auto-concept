@@ -62,6 +62,10 @@ namespace auto_concept {
 
     void Consumer::Consume() noexcept {
             Diagnostics Diag;           
+            if (this->handler.customMatcher) {
+                matchFinder.addMatcher(this->handler.customMatcher(), &handler);
+                return;
+            }
             auto matchers = GetMatchers();
             for (const auto& matcherRaw : matchers)
             {

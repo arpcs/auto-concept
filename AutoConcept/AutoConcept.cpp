@@ -42,6 +42,7 @@
 #include <filesystem>
 #include <iostream>
 #include <concepts>
+#include <functional>
 
 #include "AutoConcept.h"
 #include "Matchers.h"
@@ -50,6 +51,8 @@
 #include "CommandLine.h"
 #include "FrontendAction.h"
 #include "ResourceTypes.h"
+#include "BasicResourceGenerators.h"
+
 
 namespace auto_concept {
 
@@ -81,15 +84,24 @@ namespace auto_concept {
         return Tool.run(factory.get());
     }
 
-    int RunAppOnVirtual(std::string& virtualFile) {
-        Resources res;
+    int RunAppOnVirtual(std::string& virtualFile, 
+        std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher,
+        std::function<void(const MatchFinder::MatchResult&)>     customMatchHandler) {
+
+        if (!customMatcher && !customMatchHandler) {
+            Resources res;
+            FillMissingResources(res);
+            int h = 5;
+        }
+
+
         // Prepare for testing
-        int argc = 5;
+        int argc = 6;
         const std::string virtualFileIn = "VirtualInFile.cpp";
         const std::string virtualSuffix = "VirtualOut.cpp";
         const std::string virtualFileOut = virtualFileIn + virtualSuffix;
         const std::string suffixRewriteArg = "-rewrite-suffix=" + virtualSuffix;
-        const char* argv[] = { "AutoConceptTest", virtualFileIn.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--" };
+        const char* argv[] = { "AutoConceptTest", virtualFileIn.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--extra-arg=-std=c++2a","--"};
 
         if (std::filesystem::exists(virtualFileOut)) std::filesystem::remove(virtualFileOut);
 
@@ -108,10 +120,13 @@ namespace auto_concept {
             llvm::vfs::getRealFileSystem()
         );
 
+
         // Map the string reference to a virtual file when testing
         Tool.mapVirtualFile(virtualFileIn, virtualFile);
 
         auto factory = std::make_unique<ToolFactory>();
+        factory.get()->customMatcher = customMatcher;
+        factory.get()->customMatchHandler = customMatchHandler;
         auto result = Tool.run(factory.get());
 
         if (auto FixedVirtualFile = Tool.getFiles().getVirtualFileSystem().openFileForRead(virtualFileOut)) {

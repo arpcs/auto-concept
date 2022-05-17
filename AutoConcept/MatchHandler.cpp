@@ -72,6 +72,12 @@ namespace auto_concept {
     }
 
     void MatchHandler::run(const MatchFinder::MatchResult& Result) {
+
+        if (this->customMatchHandler) {
+            this->customMatchHandler(Result);
+            return;
+        }
+
         ASTContext* Context = Result.Context;
         auto& map = Result.Nodes.getMap();
 
