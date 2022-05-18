@@ -20,29 +20,13 @@
             // Don't change matchers
             vector<DeclarationMatcher> matchers;
 
-            /*matchers.push_back(
+            matchers.push_back(
                 functionTemplateDecl(
                     isExpansionInMainFile(),
-                    forEachDescendant(varDecl(
-                        hasDescendant(templateSpecializationType(
-                            hasDeclaration(
-                                classTemplateDecl(
-                                    hasName("numeric_limits"),
-                                    isInStdNamespace()
-                                )
-                            )
-                        )),
-                        hasDescendant(templateTypeParmType(
-                            hasDeclaration(
-                                templateTypeParmDecl().bind("templateTypeParmDecl2 arithmetic")
-                            )
-                        ))
-                    )),
                     forEach(templateTypeParmDecl(
-                        equalsBoundNode("templateTypeParmDecl2 arithmetic")
-                    ))
-                ).bind("functionTemplateDecl2 rewrite")
-            );*/
+                    ).bind("asdf"))
+                ).bind("functionTemplateDecl2")
+            );
 
 
             return matchers;

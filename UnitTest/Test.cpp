@@ -9,7 +9,7 @@ namespace auto_concept_test {
 	TEST(TestCaseName, TestName) {
 
 
-		EXPECT_EQ(runner("template<typename T> void f(T t) {return t;}"), "template<typename T> void f(T t) {return t;}");
+		//EXPECT_EQ(runner("template<typename T> void f(T t) {return t;}"), "template<typename T> void f(T t) {return t;}");
 
 		TestReader reader("RewriteTestsDeduced.cpp");
 

@@ -42,3 +42,16 @@ unordered_set<bool>	unordered_set	TRUE
 unordered_multiset<bool>	unordered_set	TRUE
 unordered_map<bool,bool>	unordered_map	TRUE
 unordered_multimap<bool,bool>	unordered_map	TRUE
+array<int,8>::iterator	iterator	TRUE
+vector<int>::iterator	iterator	TRUE
+deque<int>::iterator	iterator	TRUE
+list<int>::iterator	iterator	TRUE
+forward_list<int>::iterator	iterator	TRUE
+set<int>::iterator	iterator	TRUE
+multiset<int>::iterator	iterator	TRUE
+map<int,int>::iterator	iterator	TRUE
+multimap<int,int>::iterator	iterator	TRUE
+unordered_set<int>::iterator	iterator	TRUE
+unordered_multiset<int>::iterator	iterator	TRUE
+unordered_map<int,int>::iterator	iterator	TRUE
+unordered_multimap<int,int>::iterator	iterator	TRUE

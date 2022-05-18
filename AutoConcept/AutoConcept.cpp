@@ -90,7 +90,7 @@ namespace auto_concept {
 
         if (!customMatcher && !customMatchHandler) {
             Resources res;
-            FillMissingResources(res);
+            //FillMissingResources(res);
             int h = 5;
         }
 
@@ -101,7 +101,7 @@ namespace auto_concept {
         const std::string virtualSuffix = "VirtualOut.cpp";
         const std::string virtualFileOut = virtualFileIn + virtualSuffix;
         const std::string suffixRewriteArg = "-rewrite-suffix=" + virtualSuffix;
-        const char* argv[] = { "AutoConceptTest", virtualFileIn.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--extra-arg=-std=c++2b","--"};
+        const char* argv[] = { "AutoConceptTest", virtualFileIn.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--extra-arg=-std=c++17","--"};
 
         if (std::filesystem::exists(virtualFileOut)) std::filesystem::remove(virtualFileOut);
 

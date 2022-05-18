@@ -1,12 +1,5 @@
-
-// Setup
-#define CONCAT_INDIRECT(x, y) x ## y
-#define CONCAT(x, y) CONCAT_INDIRECT(x, y)
-#define UNIQUE_NS CONCAT(AUTO_CONCEPT_TEST_UNIQUE_NAMESPACE , __LINE__ )
-#include <limits>
-#include <type_traits>
-
-// Test
+/*
+//Test
 namespace UNIQUE_NS {
 	template<class T1, class T2, class TWrong>
 	bool isfinite(T1 x, T2 y, TWrong z)
@@ -17,10 +10,10 @@ namespace UNIQUE_NS {
 	}
 	void test() { isfinite(5, 6, 7); }
 }
-// Expected
+//Expected
 namespace UNIQUE_NS {
 	template<class T1, class T2, class TWrong>
-	requires std::is_arithmetic_v<T1> && std::is_arithmetic_v<T2> 
+	requires std::is_arithmetic_v<T1> && std::is_arithmetic_v<T2>
 	bool isfinite(T1 x, T2 y, TWrong z)
 	{
 		constexpr auto maxVal = std::numeric_limits<T1>::max();
@@ -28,4 +21,34 @@ namespace UNIQUE_NS {
 		return x <= maxVal && x >= -maxVal;
 	}
 	void test() { isfinite(5, 6, 7); }
+}
+*/
+// Setup
+#define CONCAT_INDIRECT(x, y) x ## y
+#define CONCAT(x, y) CONCAT_INDIRECT(x, y)
+#define UNIQUE_NS CONCAT(AUTO_CONCEPT_TEST_UNIQUE_NAMESPACE , __LINE__ )
+#include <limits>
+#include <type_traits>
+#include <vector>
+
+// Test
+//namespace UNIQUE_NS {
+	template<class T1, class T2>
+	bool foo(T1 x, T2 y)
+	{
+		if (x[5]) return false;
+		return true;
+	}
+	void test() { foo(std::vector<int>{1}, 1); foo(1, 1);
+	}
+//}
+// Expected
+namespace UNIQUE_NS {
+	template<class T1, class T2>
+	bool foo(T1 x, T2 y)
+	{
+		if (x[5]) return false;
+		return true;
+	}
+	void test() { foo(std::vector<int>{1}, 1); }
 }

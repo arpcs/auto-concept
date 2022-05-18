@@ -26,6 +26,7 @@
 #include "clang/Tooling/NodeIntrospection.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "clang/AST/ASTImporter.h"
 
 // LLVM includes
 #include "llvm/ADT/ArrayRef.h"
@@ -44,6 +45,17 @@
 
 #include "CommandLine.h"
 #include "MatchHandler.h"
+
+
+#include "clang/Sema/DeclSpec.h"
+#include "clang/Sema/Initialization.h"
+#include "clang/Sema/Lookup.h"
+#include "clang/Sema/Overload.h"
+#include "clang/Sema/ParsedTemplate.h"
+#include "clang/Sema/Scope.h"
+#include "clang/Sema/SemaInternal.h"
+#include "clang/Sema/Template.h"
+#include "clang/Sema/TemplateDeduction.h"
 
 namespace auto_concept {
     using namespace clang::ast_matchers;
@@ -88,6 +100,9 @@ namespace auto_concept {
         }
 
         if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl rewrite")) 
+            matches[func->getID()].push_back(Result);
+
+        if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl2"))
             matches[func->getID()].push_back(Result);
     }
 
@@ -139,6 +154,88 @@ namespace auto_concept {
                 if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
             }
 
+            if (auto* func = const_cast<clang::FunctionTemplateDecl*>( firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl2") ) ) {
+                const auto& funcDecl = func->getTemplatedDecl();
+                //const auto& funcDecl = func->getTemplatedDecl();
+
+                std::unique_ptr<ASTUnit> ToUnit = buildASTFromCode(
+                    "#include <vector>\n template<class T1, class T2> bool foo(T1 x, T2 y); \n void ass(){ foo(6, 0); }", "to.cc");
+                const clang::FunctionTemplateDecl* From = func;
+
+
+               // Sema()
+               
+               /* auto asdff = func->specializations().begin();
+                auto asdff2 = func->specializations().begin();
+                asdff2++;
+
+                asdff->dumpColor();
+                asdff2->dumpColor();
+
+                auto templateargs = asdff2->getTemplateSpecializationArgs();
+                asdff->setFunctionTemplateSpecialization(func, templateargs, nullptr);
+                
+                asdff->dumpColor();
+
+                auto hs = func->getTranslationUnitDecl()->decls_begin();
+                while (1) {
+                    hs++;
+                    if (hs->getBeginLoc().isValid()) {
+                        outs() << firstMatch.SourceManager->getCharacterData(hs->getBeginLoc());
+                        hs->dumpColor();
+                    }
+                }*/
+                //outs()<<firstMatch.SourceManager->getCharacterData();
+
+                //ASTImporter Importer(ToUnit->getASTContext(), ToUnit->getFileManager(),
+                //    From->getASTContext(), From->getASTContext().getSourceManager().getFileManager(),
+                //   /*MinimalImport=*/false);
+                ASTImporter Importer(
+                    From->getASTContext(), From->getASTContext().getSourceManager().getFileManager(),
+                    ToUnit->getASTContext(), ToUnit->getFileManager(), 
+                    /*MinimalImport=*/false);
+
+                auto MB = functionDecl(isExpansionInMainFile(), hasName("ass"), hasDescendant( declRefExpr().bind("proba"))).bind("bindStr");
+                auto MatchRes = match(MB, ToUnit->getASTContext());
+                FunctionDecl* Result = const_cast<FunctionDecl*>(MatchRes[0].template getNodeAs<FunctionDecl>("bindStr"));
+                DeclRefExpr* Result2 = const_cast<DeclRefExpr*>(MatchRes[0].template getNodeAs<DeclRefExpr>("proba"));
+                auto fundecl = Result;
+
+                Result->dumpColor();
+                Result2->dumpColor();
+
+                auto ImportedOrErr = Importer.Import(Result2);
+                if (!ImportedOrErr) {
+                    llvm::Error Err = ImportedOrErr.takeError();
+                    llvm::errs() << "ERROR: " << Err << "\n";
+                    consumeError(std::move(Err));
+                    return;
+                }
+                DeclRefExpr* Imported = (DeclRefExpr*)ImportedOrErr.get();
+
+                
+                Imported->dumpColor();
+                Imported->getDecl()->dumpColor();
+
+                Imported->getDecl()->getAsFunction()->dumpColor();
+
+                outs()<<Imported->getDecl()->getAsFunction()->isInvalidDecl()<<" - \n";
+
+                Imported->getDecl()->getAsFunction()->getPrimaryTemplate()->dumpColor();
+                //ImportedOrErr.get()->dumpColor();
+
+                //ImportedOrErr.get()->getdecl().dump();
+
+                //Imported->getTranslationUnitDecl()->dump();
+
+                /*if (llvm::Error Err = Importer.ImportDefinition(From)) {
+                    llvm::errs() << "ERROR: " << Err << "\n";
+                    consumeError(std::move(Err));
+                    return 1;
+                }
+                llvm::errs() << "Imported definition.\n";*/
+                //Imported->getTranslationUnitDecl()->dump();
+            }
             
         }
     }

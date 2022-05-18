@@ -15,7 +15,7 @@
             std::vector<clang::ast_matchers::DeclarationMatcher> ret;
             auto deduced = GetMatchersDeduced();
             auto guessed = GetMatchersGuessed();
-            std::copy(deduced.begin(), deduced.end(), std::back_inserter(ret));
+            //std::copy(deduced.begin(), deduced.end(), std::back_inserter(ret));
             std::copy(guessed.begin(), guessed.end(), std::back_inserter(ret));
             return ret;
         }
