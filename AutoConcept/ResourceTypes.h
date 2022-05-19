@@ -3,6 +3,8 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <unordered_set>
+#include "llvm/ADT/SmallVector.h"
 
 namespace auto_concept {
 
@@ -11,18 +13,18 @@ namespace auto_concept {
 		bool conceptsGood = false;
 	};*/
 
-	class Types {
+	class Type {
 	public:
-		Types(std::string_view line);
+		Type(std::string_view line);
 		std::string toStr();
 		std::string name;
 		std::string include;
 		bool cpp20std = false;
 	};
 
-	class Concepts {
+	class Concept {
 	public:
-		Concepts(std::string_view line);
+		Concept(std::string_view line);
 		std::string toStr();
 
 		std::string name;
@@ -32,9 +34,17 @@ namespace auto_concept {
 		bool found = false;
 		bool cpp20std = false;
 		bool isConcept = false;
-		std::vector<std::string> specializations;
-		std::vector<std::string> passingTypes;
+		std::unordered_set<std::string> specializations;
+		std::unordered_set<std::string> passingTypes;
 	};
+
+	struct SpecializedConcept {
+		Concept conc;
+		std::string templateParamNames;
+		SpecializedConcept(const Concept& conc, const std::string& templateParamNames) : 
+			conc{ conc }, templateParamNames{ templateParamNames } {}
+	};
+
 
 	// Main resource handler
 	class Resources {
@@ -45,8 +55,8 @@ namespace auto_concept {
 
 		std::string typesFirstRow, conceptsFirstRow;
 
-		std::vector<Types> types;
-		std::vector<Concepts> concepts;
+		std::vector<Type> types;
+		std::vector<Concept> concepts;
 	};
 
 

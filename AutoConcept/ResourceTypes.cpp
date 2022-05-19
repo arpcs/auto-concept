@@ -6,13 +6,14 @@
 #include <string>
 #include <string_view>
 #include <fstream>
+#include <unordered_set>
 
 namespace auto_concept {
 	using namespace std;
 
 	constexpr bool TESTING = false;
 
-	Types::Types(string_view line){
+	Type::Type(string_view line){
 		size_t startLoc = 0, tabLoc = 0;
 		
 		tabLoc = line.find('\t', startLoc);
@@ -31,7 +32,7 @@ namespace auto_concept {
 			startLoc = tabLoc + 1;
 		}
 	}
-	std::string Types::toStr() {
+	std::string Type::toStr() {
 		std::string res;
 		res += this->name + "\t"s;
 		res += this->include + "\t"s;
@@ -42,7 +43,7 @@ namespace auto_concept {
 
 
 	//CONCEPT NAME	DESCRIPTION	# ARGUMENTS	INCLUDES 	EXPOSITION ONLY	CPP20 STD	IS CONCEPT	PASSING TYPES
-	Concepts::Concepts(string_view line){
+	Concept::Concept(string_view line){
 		size_t startLoc = 0, tabLoc = 0, colonLoc = 0;
 
 		tabLoc = line.find('\t', startLoc);
@@ -94,7 +95,7 @@ namespace auto_concept {
 				else						type = string{ line2.substr(startLoc) };
 				if (type.find('\"') == 0) type = type.substr(1);
 				if (type.find('\"') != string::npos) type = type.substr(0, type.length() - 1);
-				if (type.length() > 0) this->specializations.push_back(type);
+				if (type.length() > 0) this->specializations.insert(type);
 				startLoc = colonLoc + 1;
 			}
 			startLoc = tabLoc + 1;
@@ -109,12 +110,12 @@ namespace auto_concept {
 			else						type = string{ line.substr(startLoc) };
 			if (type.find('\"') == 0) type = type.substr(1);
 			if (type.find('\"') != string::npos) type = type.substr(0, type.length()-1);
-			if (type.length() > 0) this->passingTypes.push_back(type);
+			if (type.length() > 0) this->passingTypes.insert(type);
 			startLoc = tabLoc + 1;
 		}
 	}
 
-	std::string Concepts::toStr() {
+	std::string Concept::toStr() {
 		std::string res;
 		res += this->name + "\t"s;
 		res += this->description + "\t"s;

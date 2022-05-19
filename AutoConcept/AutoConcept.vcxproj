@@ -383,6 +383,7 @@
     <ClInclude Include="ConsoleHelpers.h" />
     <ClInclude Include="Consumer.h" />
     <ClInclude Include="FrontendAction.h" />
+    <ClInclude Include="Guesser.h" />
     <ClInclude Include="Matchers.h" />
     <ClInclude Include="MatchHandler.h" />
     <ClInclude Include="CommandLine.h" />

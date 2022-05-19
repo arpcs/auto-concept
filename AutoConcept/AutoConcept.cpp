@@ -72,6 +72,8 @@ namespace auto_concept {
             return 1;
         }
 
+        auto resources = std::make_shared<Resources>();
+
         CommonOptionsParser& OptionsParser = ExpectedParser.get();
         ClangTool    Tool(OptionsParser.getCompilations(),
             OptionsParser.getSourcePathList(),
@@ -80,7 +82,7 @@ namespace auto_concept {
         );
 
         auto factory = std::make_unique<ToolFactory>();
-
+        factory.get()->resources = resources;
         return Tool.run(factory.get());
     }
 
@@ -88,10 +90,9 @@ namespace auto_concept {
         std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher,
         std::function<void(const MatchFinder::MatchResult&)>     customMatchHandler) {
 
+        auto resources = std::make_shared<Resources>();
         if (!customMatcher && !customMatchHandler) {
-            Resources res;
             //FillMissingResources(res);
-            int h = 5;
         }
 
 
@@ -101,7 +102,7 @@ namespace auto_concept {
         const std::string virtualSuffix = "VirtualOut.cpp";
         const std::string virtualFileOut = virtualFileIn + virtualSuffix;
         const std::string suffixRewriteArg = "-rewrite-suffix=" + virtualSuffix;
-        const char* argv[] = { "AutoConceptTest", virtualFileIn.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--extra-arg=-std=c++17","--"};
+        const char* argv[] = { "AutoConceptTest", virtualFileIn.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--extra-arg=-std=c++17","--extra-arg=-ferror-limit=0","--"};
 
         if (std::filesystem::exists(virtualFileOut)) std::filesystem::remove(virtualFileOut);
 
@@ -127,6 +128,7 @@ namespace auto_concept {
         auto factory = std::make_unique<ToolFactory>();
         factory.get()->customMatcher = customMatcher;
         factory.get()->customMatchHandler = customMatchHandler;
+        factory.get()->resources = resources;
         auto result = Tool.run(factory.get());
 
         if (auto FixedVirtualFile = Tool.getFiles().getVirtualFileSystem().openFileForRead(virtualFileOut)) {

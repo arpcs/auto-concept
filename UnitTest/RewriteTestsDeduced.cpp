@@ -30,19 +30,11 @@ namespace UNIQUE_NS {
 #include <limits>
 #include <type_traits>
 #include <vector>
+#include <ranges>
+using namespace std;
+using namespace ranges;
 
 // Test
-//namespace UNIQUE_NS {
-	template<class T1, class T2>
-	bool foo(T1 x, T2 y)
-	{
-		if (x[5]) return false;
-		return true;
-	}
-	void test() { foo(std::vector<int>{1}, 1); foo(1, 1);
-	}
-//}
-// Expected
 namespace UNIQUE_NS {
 	template<class T1, class T2>
 	bool foo(T1 x, T2 y)
@@ -50,5 +42,22 @@ namespace UNIQUE_NS {
 		if (x[5]) return false;
 		return true;
 	}
-	void test() { foo(std::vector<int>{1}, 1); }
+	void test() {
+		foo(std::vector<int>{1}, 1);
+		foo(1, 1);
+	}
+}
+// Expected
+namespace UNIQUE_NS {
+	template<class T1, class T2>
+	requires contiguous_range<T1> && signed_integral<T2> 
+	bool foo(T1 x, T2 y)
+	{
+		if (x[5]) return false;
+		return true;
+	}
+	void test() {
+		foo(std::vector<int>{1}, 1);
+		foo(1, 1);
+	}
 }

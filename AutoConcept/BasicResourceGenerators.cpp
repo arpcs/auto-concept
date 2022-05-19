@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <iterator>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <clang/ASTMatchers/ASTMatchers.h>
 #include <clang/ASTMatchers/ASTMatchFinder.h>
@@ -31,7 +32,7 @@ namespace auto_concept {
             #include <iterator>)";
 
         ProgressBar conceptProgressBar("Filling basic concept parameters", 
-            std::count_if(resources.concepts.begin(), resources.concepts.end(), [](Concepts& r) { return r.isConcept; }));
+            std::count_if(resources.concepts.begin(), resources.concepts.end(), [](Concept& r) { return r.isConcept; }));
         unordered_map<string, int> conceptNames;
         {
             int i = 0;
@@ -57,7 +58,7 @@ namespace auto_concept {
         conceptProgressBar.End();
 
         ProgressBar templateProgressBar("Filling basic template predictate parameters",
-            std::count_if(resources.concepts.begin(), resources.concepts.end(), [](Concepts& r) { return !r.isConcept; }));
+            std::count_if(resources.concepts.begin(), resources.concepts.end(), [](Concept& r) { return !r.isConcept; }));
         RunAppOnVirtual(input,
             [&]() { return decl( has(templateTypeParmDecl()), has(varDecl(isConstexpr(), hasType(booleanType())))).bind("varTempDec"); },
             [&](const MatchFinder::MatchResult& result) {
@@ -101,7 +102,7 @@ namespace auto_concept {
         for (auto& row : resources.concepts) row.passingTypes.clear();
 
         ProgressBar conceptProgressBar("Testing concepts",
-            std::count_if(resources.concepts.begin(), resources.concepts.end(), [](Concepts& r) { return r.found && r.numberOfArguments==1; }) * resources.types.size() );
+            std::count_if(resources.concepts.begin(), resources.concepts.end(), [](Concept& r) { return r.found && r.numberOfArguments==1; }) * resources.types.size() );
 
         unordered_map<string, int> includesMap;
         for (const auto& typesRow : resources.types) {
@@ -152,7 +153,7 @@ namespace auto_concept {
                             }else if (value.getBoolValue() == true)
                             {
                                 int ID = stoi(conceptDec->getDeclName().getAsString().substr(string("testVal").size()));
-                                resources.concepts[IDToConcept[ID]].passingTypes.push_back(
+                                resources.concepts[IDToConcept[ID]].passingTypes.insert(
                                     resources.types[IDToType[ID]].name);
                             }
                             conceptProgressBar.Tick();
@@ -165,7 +166,7 @@ namespace auto_concept {
 
         /*
         ProgressBar templateProgressBar("Testing template predictates",
-            std::count_if(resources.concepts.begin(), resources.concepts.end(), [](Concepts& r) { return !r.isConcept; }));
+            std::count_if(resources.concepts.begin(), resources.concepts.end(), [](Concept& r) { return !r.isConcept; }));
         RunAppOnVirtual(input,
             [&]() { return decl(has(templateTypeParmDecl()), has(varDecl(isConstexpr(), hasType(booleanType())))).bind("varTempDec"); },
             [&](const MatchFinder::MatchResult& result) {

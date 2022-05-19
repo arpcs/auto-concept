@@ -22,7 +22,15 @@
 
             matchers.push_back(
                 functionTemplateDecl(
-                    isExpansionInMainFile(),
+                    unless(
+                        anyOf(
+                            hasParent(
+                                isInStdNamespace()
+                            ),
+                            isInStdNamespace(),
+                            isExpansionInSystemHeader()
+                        )
+                    ),
                     forEach(templateTypeParmDecl(
                     ).bind("asdf"))
                 ).bind("functionTemplateDecl2")
