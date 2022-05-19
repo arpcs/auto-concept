@@ -1,0 +1,57 @@
+TYPE OF INTEREST	includes	CPP20 STD
+void		TRUE
+bool		TRUE
+char		TRUE
+char*		TRUE
+short		TRUE
+int		TRUE
+int*		TRUE
+long long		TRUE
+long long*		TRUE
+unsigned char		TRUE
+unsigned char*		TRUE
+unsigned short		TRUE
+unsigned int		TRUE
+unsigned int*		TRUE
+unsigned long long		TRUE
+unsigned long long*		TRUE
+string	string	TRUE
+array<int,8>	array	TRUE
+vector<int>	vector	TRUE
+deque<int>	deque	TRUE
+list<int>	list	TRUE
+forward_list<int>	forward_list	TRUE
+set<int>	set	TRUE
+multiset<int>	set	TRUE
+map<int,int>	map	TRUE
+multimap<int,int>	map	TRUE
+unordered_set<int>	unordered_set	TRUE
+unordered_multiset<int>	unordered_set	TRUE
+unordered_map<int,int>	unordered_map	TRUE
+unordered_multimap<int,int>	unordered_map	TRUE
+array<bool,8>	array	TRUE
+vector<bool>	vector	TRUE
+deque<bool>	deque	TRUE
+list<bool>	list	TRUE
+forward_list<bool>	forward_list	TRUE
+set<bool>	set	TRUE
+multiset<bool>	set	TRUE
+map<bool,bool>	map	TRUE
+multimap<bool,bool>	map	TRUE
+unordered_set<bool>	unordered_set	TRUE
+unordered_multiset<bool>	unordered_set	TRUE
+unordered_map<bool,bool>	unordered_map	TRUE
+unordered_multimap<bool,bool>	unordered_map	TRUE
+array<int,8>::iterator	iterator	TRUE
+vector<int>::iterator	iterator	TRUE
+deque<int>::iterator	iterator	TRUE
+list<int>::iterator	iterator	TRUE
+forward_list<int>::iterator	iterator	TRUE
+set<int>::iterator	iterator	TRUE
+multiset<int>::iterator	iterator	TRUE
+map<int,int>::iterator	iterator	TRUE
+multimap<int,int>::iterator	iterator	TRUE
+unordered_set<int>::iterator	iterator	TRUE
+unordered_multiset<int>::iterator	iterator	TRUE
+unordered_map<int,int>::iterator	iterator	TRUE
+unordered_multimap<int,int>::iterator	iterator	TRUE

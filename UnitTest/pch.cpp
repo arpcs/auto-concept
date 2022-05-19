@@ -11,7 +11,7 @@ namespace auto_concept_test {
 	using namespace auto_concept;
 
 	std::string runner(std::string input) {
-		RunAppTest(input);
+		RunAppOnVirtual(input);
 		return input;
 	}
 }

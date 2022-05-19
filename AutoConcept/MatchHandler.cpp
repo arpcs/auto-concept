@@ -26,6 +26,7 @@
 #include "clang/Tooling/NodeIntrospection.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "clang/AST/ASTImporter.h"
 
 // LLVM includes
 #include "llvm/ADT/ArrayRef.h"
@@ -38,12 +39,23 @@
 #include <memory>
 #include <string>
 #include <type_traits>
-
+#include <optional>
 #include <iostream>
 #include <concepts>
 
 #include "CommandLine.h"
 #include "MatchHandler.h"
+#include "Guesser.h"
+
+#include "clang/Sema/DeclSpec.h"
+#include "clang/Sema/Initialization.h"
+#include "clang/Sema/Lookup.h"
+#include "clang/Sema/Overload.h"
+#include "clang/Sema/ParsedTemplate.h"
+#include "clang/Sema/Scope.h"
+#include "clang/Sema/SemaInternal.h"
+#include "clang/Sema/Template.h"
+#include "clang/Sema/TemplateDeduction.h"
 
 namespace auto_concept {
     using namespace clang::ast_matchers;
@@ -72,6 +84,12 @@ namespace auto_concept {
     }
 
     void MatchHandler::run(const MatchFinder::MatchResult& Result) {
+
+        if (this->customMatchHandler) {
+            this->customMatchHandler(Result);
+            return;
+        }
+
         ASTContext* Context = Result.Context;
         auto& map = Result.Nodes.getMap();
 
@@ -82,6 +100,9 @@ namespace auto_concept {
         }
 
         if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl rewrite")) 
+            matches[func->getID()].push_back(Result);
+
+        if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl2"))
             matches[func->getID()].push_back(Result);
     }
 
@@ -121,7 +142,7 @@ namespace auto_concept {
                 // ToDo: \t....
                 auto FixIt = FixItHint::CreateInsertion(funcDecl->getBeginLoc(), replaceText + "\n\t");
                 auto& diag = firstContext->getDiagnostics();
-                const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Consider adding concept to template(s): %0");
+                const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Consider adding concepts to template(s): %0");
                 // So we destroy our builder to execute it..
                 {
                     const auto& builder = diag.Report(func->getBeginLoc(), diagID);
@@ -133,6 +154,87 @@ namespace auto_concept {
                 if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
             }
 
+            if (auto* funcTemp = const_cast<clang::FunctionTemplateDecl*>(firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl2"))) {
+
+                Guesser guesser(resources);
+                if (funcTemp->getTemplateParameters()) {
+                    for (const auto& param : *funcTemp->getTemplateParameters()) 
+                        guesser.templateParams.push_back(param->getName().str());
+
+                    for (auto spec : funcTemp->specializations()) {
+                        spec->dumpColor();
+                        auto specParams = spec->getTemplateSpecializationArgs();
+                        Guesser::SpecTypes specParamObj;
+                        for (const auto& param : specParams->asArray()) {
+                            auto fullType = param.getAsType().getCanonicalType().getAsString();
+                            while (true) {
+                                auto pos = fullType.find("std::");
+                                if (pos == string::npos) break;
+                                fullType = fullType.substr(0, pos) + fullType.substr(pos + "std::"s.size());
+                            }
+                            while (true) {
+                                auto pos = fullType.find("class");
+                                if (pos == string::npos) break;
+                                fullType = fullType.substr(0, pos) + fullType.substr(pos + "class"s.size());
+                            }
+                            while (true) {
+                                auto pos = fullType.find(' ');
+                                if (pos == string::npos) break;
+                                fullType = fullType.substr(0, pos) + fullType.substr(pos + " "s.size());
+                            }
+                            specParamObj.types.push_back(fullType);
+                        }
+
+                        specParamObj.good = !spec->isInvalidDecl();
+                        guesser.templateSpecs.push_back(specParamObj);
+                    }
+
+                    auto fitting = guesser.GetFittingConcepts();
+                    
+                    // Rewriting
+
+                    const auto& funcDecl = funcTemp->getTemplatedDecl();
+
+                    FullSourceLoc FullLocation = firstContext->getFullLoc(funcDecl->getBeginLoc());
+                    FullLocation.getColumnNumber();
+                    SourceLocation s = funcDecl->getBeginLoc();
+
+                    auto& DiagnosticsEngine = firstContext->getDiagnostics();
+                    RewriterPointer Rewriter;
+                    if (DoRewrite) Rewriter = createRewriter(DiagnosticsEngine, *firstContext);
+
+                    string replaceText = "requires ";
+                    string noteText = "";
+                    int i = 0;
+                    for (auto f : fitting)
+                    {
+                        if (f) {
+                            outs() << f->templateParamNames << " : ";
+                            outs() << f->conc.name << "\n";
+                            const std::string& paramName = f->templateParamNames;
+                            if (i++ != 0) {
+                                replaceText += "&& ";
+                                noteText += " ";
+                            }
+                            replaceText += f->conc.name+"<" + paramName + "> ";
+                            noteText += "("+f->conc.name + ")'" + paramName + "'";
+                        }
+                    }
+                    // ToDo: \t....
+                    auto FixIt = FixItHint::CreateInsertion(funcDecl->getBeginLoc(), replaceText + "\n\t");
+                    auto& diag = firstContext->getDiagnostics();
+                    const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Consider adding concepts to template(s): %0");
+                    // So we destroy our builder to execute it..
+                    {
+                        const auto& builder = diag.Report(funcTemp->getBeginLoc(), diagID);
+                        builder.AddString(noteText);
+                        builder.AddFixItHint(FixIt);
+                    }
+
+
+                    if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
+                }
+            }
             
         }
     }

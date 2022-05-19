@@ -363,21 +363,38 @@
       <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='ReleaseFast|x64'">false</MinimalRebuild>
     </ClCompile>
     <ClCompile Include="CommandLine.cpp" />
+    <ClCompile Include="ConsoleHelpers.cpp" />
     <ClCompile Include="Consumer.cpp" />
     <ClCompile Include="MatchersDeduced.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseFast|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugFast|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="MatchersGuessed.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugFast|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseFast|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="MatchHandler.cpp" />
+    <ClCompile Include="BasicResourceGenerators.cpp" />
+    <ClCompile Include="ResourceTypes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoConcept.h" />
+    <ClInclude Include="ConsoleHelpers.h" />
     <ClInclude Include="Consumer.h" />
     <ClInclude Include="FrontendAction.h" />
+    <ClInclude Include="Guesser.h" />
     <ClInclude Include="Matchers.h" />
     <ClInclude Include="MatchHandler.h" />
     <ClInclude Include="CommandLine.h" />
+    <ClInclude Include="BasicResourceGenerators.h" />
+    <ClInclude Include="ResourceTypes.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Concepts.txt" />
+    <Text Include="ConceptsBase.txt" />
+    <Text Include="Types.txt" />
+    <Text Include="TypesBase.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

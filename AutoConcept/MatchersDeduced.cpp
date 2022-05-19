@@ -15,7 +15,7 @@
         using namespace std;
         using namespace clang::ast_matchers;
 
-        vector<DeclarationMatcher> GetMatchers(){
+        vector<DeclarationMatcher> GetMatchersDeduced(){
 
             // Don't change matchers
             vector<DeclarationMatcher> matchers;
