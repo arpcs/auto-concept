@@ -61,7 +61,7 @@ namespace auto_concept {
     using namespace std;
 
     void Consumer::Consume() noexcept {
-            Diagnostics Diag;           
+            Diagnostics Diag;        
             if (this->handler.customMatcher) {
                 matchFinder.addMatcher(this->handler.customMatcher(), &handler);
                 return;

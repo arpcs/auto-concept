@@ -19,5 +19,6 @@ namespace UNIQUE_NS {
 	void test() {
 		foo(std::vector<int>{1}, 1);
 		foo(1, 1);
+		foo(1, std::vector<int>{1});
 	}
 }

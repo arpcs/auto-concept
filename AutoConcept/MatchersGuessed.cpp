@@ -31,6 +31,8 @@
                             isExpansionInSystemHeader()
                         )
                     ),
+                    isExpansionInMainFile()
+                    ,
                     forEach(templateTypeParmDecl(
                     ).bind("asdf"))
                 ).bind("functionTemplateDecl2")

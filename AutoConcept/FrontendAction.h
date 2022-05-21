@@ -28,6 +28,8 @@
 #include "clang/Tooling/NodeIntrospection.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
+#include "clang/Frontend/CompilerInvocation.h"
+
 
 // LLVM includes
 #include "llvm/ADT/ArrayRef.h"
@@ -47,6 +49,8 @@
 
 #include "CommandLine.h"
 #include "ResourceTypes.h"
+#include "clang/Frontend/CompilerInstance.h"
+#include <clang/Sema/Sema.h>
 
 namespace auto_concept {
 
@@ -57,17 +61,23 @@ namespace auto_concept {
         using MatchFinder = clang::ast_matchers::MatchFinder;
 
         /// Constructor, taking the \p RewriteOption and \p RewriteSuffixOption.
-        Action(bool DoRewrite, const std::string& RewriteSuffix, 
+        Action(bool DoRewrite, const std::string& RewriteSuffix, bool skipProbing,
             std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher,
             std::function<void(const MatchFinder::MatchResult&)> customMatchHandler,
-            std::shared_ptr<Resources> resources)
-            : DoRewrite(DoRewrite), RewriteSuffix(RewriteSuffix), customMatcher(customMatcher), customMatchHandler(customMatchHandler), resources{ resources } {
-        }
+            std::shared_ptr<Resources> resources,
+            bool injectingErrors)
+            : DoRewrite(DoRewrite), RewriteSuffix(RewriteSuffix), skipProbing{ skipProbing }, customMatcher(customMatcher), 
+            customMatchHandler(customMatchHandler), resources{ resources }, injectingErrors{ injectingErrors }
+        {}
 
         /// Creates the Consumer instance, forwarding the command line options.
         ASTConsumerPointer CreateASTConsumer(clang::CompilerInstance& Compiler,
             llvm::StringRef Filename) override {
-            return std::make_unique<Consumer>(DoRewrite, RewriteSuffix, customMatcher, customMatchHandler, resources);
+           // Compiler.getDiagnostics().setSuppressAllDiagnostics(true);
+    
+
+            //Compiler.getSema().CheckFunctionTemplateSpecialization;
+            return std::make_unique<Consumer>(DoRewrite, RewriteSuffix, customMatcher, customMatchHandler, resources, injectingErrors);
         }
 
     private:
@@ -75,6 +85,8 @@ namespace auto_concept {
         std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher;
         std::function<void(const MatchFinder::MatchResult&)> customMatchHandler;
         std::shared_ptr<Resources> resources;
+        bool injectingErrors;
+        bool skipProbing;
 
         /// Whether we want to rewrite files. Forwarded to the consumer.
         bool DoRewrite;
@@ -83,17 +95,25 @@ namespace auto_concept {
         std::string RewriteSuffix;
     };
 
+
+    using namespace clang;
     /// A custom \c FrontendActionFactory so that we can pass the options
     /// to the constructor of the tool.
-    struct ToolFactory : public clang::tooling::FrontendActionFactory {
+    class ToolFactory : public clang::tooling::FrontendActionFactory {
+    public:
         using MatchFinder = clang::ast_matchers::MatchFinder;
         std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher;
         std::function<void(const MatchFinder::MatchResult&)> customMatchHandler;
         std::shared_ptr<Resources> resources;
-
+        bool injectingProbes = false;
+        std::string injectionProbingSuffix = "AutoConceptTempFile";
         std::unique_ptr<clang::FrontendAction> create() override {
-            return std::make_unique<auto_concept::Action>(CLOptions::RewriteOption, CLOptions::RewriteSuffixOption, customMatcher, customMatchHandler, resources);
+            if (injectingProbes) {
+                return std::make_unique<auto_concept::Action>(true, "AutoConceptTempFile", CLOptions::SkipProbingOption, customMatcher, customMatchHandler, resources, injectingProbes);
+            }
+            return std::make_unique<auto_concept::Action>(CLOptions::RewriteOption, CLOptions::RewriteSuffixOption, CLOptions::SkipProbingOption, customMatcher, customMatchHandler, resources, injectingProbes);
         }
+
     };
 
 }

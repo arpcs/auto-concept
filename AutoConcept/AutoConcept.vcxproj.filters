@@ -63,6 +63,9 @@
     <ClCompile Include="MatchHandler.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Guesser.cpp">
+      <Filter>Resource Generator\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoConcept.h">

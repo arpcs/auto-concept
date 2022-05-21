@@ -54,7 +54,7 @@ namespace auto_concept {
 
 
         // Apply a custom category to all command-line options so that they are the only ones displayed.
-        OptionCategory CLOptions::MyToolCategory("my-tool options");
+        OptionCategory CLOptions::MyToolCategory("AutoConcept options");
 
         // CommonOptionsParser declares HelpMessage with a description of the common
         // command-line options related to the compilation database and input files.
@@ -62,13 +62,32 @@ namespace auto_concept {
         extrahelp CLOptions::CommonHelp(CommonOptionsParser::HelpMessage);
 
         llvm::cl::opt<bool> CLOptions::RewriteOption("rewrite",
-                llvm::cl::init(false),
-                llvm::cl::desc("If set, emits rewritten source code"),
-                llvm::cl::cat(MyToolCategory));
-
+            llvm::cl::init(false),
+            llvm::cl::desc("If set, emits rewritten source code"),
+            llvm::cl::cat(MyToolCategory));
+        llvm::cl::opt<bool> CLOptions::SkipProbingOption("skip-probing",
+            llvm::cl::init(false),
+            llvm::cl::desc("If set, skips probing templates for valid arguments"),
+            llvm::cl::cat(MyToolCategory));
         llvm::cl::opt<std::string> CLOptions::RewriteSuffixOption("rewrite-suffix",
             llvm::cl::desc("If -rewrite is set, changes will be rewritten to a file with the same name, but this suffix"),
             llvm::cl::cat(MyToolCategory));
+       /* llvm::cl::opt<int> CLOptions::ThresholdOption("threshold",
+            llvm::cl::desc("The threshold"),
+            llvm::cl::cat(MyToolCategory));*/
+
+        llvm::cl::alias CLOptions::RewriteSuffixOptionAlias("x",
+            llvm::cl::desc("Alias for rewrite-suffix option"),
+            llvm::cl::aliasopt(CLOptions::RewriteSuffixOption)
+        ); 
+        llvm::cl::alias CLOptions::SkipProbingOptionAlias("s",
+            llvm::cl::desc("Alias for skip-probing option"),
+            llvm::cl::aliasopt(CLOptions::SkipProbingOption)
+        );
+        llvm::cl::alias CLOptions::RewriteOptionAlias("r",
+            llvm::cl::desc("Alias for rewrite option"),
+            llvm::cl::aliasopt(CLOptions::RewriteOption)
+        );
 
         // A help message for this specific tool can be added afterwards.
         extrahelp CLOptions::MoreHelp("\nMore help text...");
@@ -83,7 +102,7 @@ namespace auto_concept {
                 return Filename;
             }
 
-            const auto NewFilename = Filename + RewriteSuffix;
+            const auto NewFilename = Filename.substr(0, Filename.find_last_of('.') + 1) + RewriteSuffix + Filename.substr(Filename.find_last_of('.'));
             llvm::errs() << "from " << Filename << " to " << NewFilename << "\n";
 
             return NewFilename;
