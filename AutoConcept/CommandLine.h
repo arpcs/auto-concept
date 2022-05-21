@@ -58,6 +58,12 @@ namespace auto_concept {
 
         static llvm::cl::opt<bool> RewriteOption;
         static llvm::cl::opt<std::string> RewriteSuffixOption;
+        static llvm::cl::opt<bool> SkipProbingOption;
+        //static llvm::cl::opt<int> ThresholdOption;
+        static llvm::cl::alias RewriteOptionAlias;
+        static llvm::cl::alias RewriteSuffixOptionAlias;
+        static llvm::cl::alias SkipProbingOptionAlias;
+        //static llvm::cl::alias ThresholdOptionAlias;
 
         // A help message for this specific tool can be added afterwards.
         static llvm::cl::extrahelp MoreHelp;

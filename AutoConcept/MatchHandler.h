@@ -60,7 +60,7 @@ namespace auto_concept {
         std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher;
         std::function<void(const MatchFinder::MatchResult&)> customMatchHandler;
         std::shared_ptr<Resources> resources;
-
+        bool injectingErrors;
 
         friend Consumer;
         /// Allocates a \c FixItRewriter and sets it as the client of the given \p DiagnosticsEngine.
@@ -71,8 +71,9 @@ namespace auto_concept {
         MatchHandler(bool DoRewrite, const std::string& RewriteSuffix, 
             std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher,
             std::function<void(const MatchFinder::MatchResult&)> customMatchHandler,
-            std::shared_ptr<Resources> resources)
-            : FixItOptions(RewriteSuffix), DoRewrite(DoRewrite), customMatcher(customMatcher), customMatchHandler(customMatchHandler), resources{ resources }{}
+            std::shared_ptr<Resources> resources,
+            bool injectingErrors)
+            : FixItOptions(RewriteSuffix), DoRewrite(DoRewrite), customMatcher(customMatcher), customMatchHandler(customMatchHandler), resources{ resources }, injectingErrors{ injectingErrors } {}
 
         virtual void run(const clang::ast_matchers::MatchFinder::MatchResult& Result) final;
         virtual void onStartOfTranslationUnit() final;

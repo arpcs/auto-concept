@@ -80,6 +80,8 @@ namespace auto_concept {
         // handles a diagnostic.
         DiagnosticsEngine.setClient(Rewriter.get(), /*ShouldOwnClient=*/false);
 
+        
+
         return Rewriter;
     }
 
@@ -149,7 +151,7 @@ namespace auto_concept {
                     builder.AddString(noteText);
                     builder.AddFixItHint(FixIt);
                 }
-    
+                
 
                 if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
             }
@@ -223,6 +225,7 @@ namespace auto_concept {
                     // ToDo: \t....
                     auto FixIt = FixItHint::CreateInsertion(funcDecl->getBeginLoc(), replaceText + "\n\t");
                     auto& diag = firstContext->getDiagnostics();
+                    
                     const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Consider adding concepts to template(s): %0");
                     // So we destroy our builder to execute it..
                     {
