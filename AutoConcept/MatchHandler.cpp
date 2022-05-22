@@ -57,6 +57,8 @@
 #include "clang/Sema/Template.h"
 #include "clang/Sema/TemplateDeduction.h"
 
+#include "ProbeManager.h"
+
 namespace auto_concept {
     using namespace clang::ast_matchers;
     using namespace clang::tooling;
@@ -113,6 +115,18 @@ namespace auto_concept {
     }
 
     void MatchHandler::onEndOfTranslationUnit() {      
+
+        RewriterPointer Rewriter = nullptr;
+        if (DoRewrite && matches.size() > 0) {
+            ASTContext* firstContext = matches.begin()->second.begin()->Context;
+            if (firstContext != nullptr) {
+                auto& DiagnosticsEngine = firstContext->getDiagnostics();
+                Rewriter = createRewriter(DiagnosticsEngine, *firstContext);
+            }
+        }  
+        if (this->tuState == AutoConceptTuState::InjectingProbes) InjectProbes(matches, resources);
+        else if (this->tuState == AutoConceptTuState::CollectingResults) {}
+        else if (this->tuState == AutoConceptTuState::ActingOnResults)
         for (auto& matchesPair : matches) {
             auto firstMatch = *matchesPair.second.begin();
             ASTContext* firstContext = firstMatch.Context;
@@ -123,10 +137,6 @@ namespace auto_concept {
                 FullSourceLoc FullLocation = firstContext->getFullLoc(funcDecl->getBeginLoc());
                 FullLocation.getColumnNumber();
                 SourceLocation s = funcDecl->getBeginLoc();
-
-                auto& DiagnosticsEngine = firstContext->getDiagnostics();
-                RewriterPointer Rewriter;
-                if (DoRewrite) Rewriter = createRewriter(DiagnosticsEngine, *firstContext);
 
                 string replaceText = "requires ";
                 string noteText = "";
@@ -152,10 +162,8 @@ namespace auto_concept {
                     builder.AddFixItHint(FixIt);
                 }
                 
-
-                if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
             }
-
+            
             if (auto* funcTemp = const_cast<clang::FunctionTemplateDecl*>(firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl2"))) {
 
                 Guesser guesser(resources);
@@ -201,10 +209,6 @@ namespace auto_concept {
                     FullLocation.getColumnNumber();
                     SourceLocation s = funcDecl->getBeginLoc();
 
-                    auto& DiagnosticsEngine = firstContext->getDiagnostics();
-                    RewriterPointer Rewriter;
-                    if (DoRewrite) Rewriter = createRewriter(DiagnosticsEngine, *firstContext);
-
                     string replaceText = "requires ";
                     string noteText = "";
                     int i = 0;
@@ -233,13 +237,12 @@ namespace auto_concept {
                         builder.AddString(noteText);
                         builder.AddFixItHint(FixIt);
                     }
-
-
-                    if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
                 }
             }
             
         }
+
+        if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
     }
 
 }

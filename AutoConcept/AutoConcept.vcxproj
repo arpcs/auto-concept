@@ -377,6 +377,7 @@
     </ClCompile>
     <ClCompile Include="MatchHandler.cpp" />
     <ClCompile Include="BasicResourceGenerators.cpp" />
+    <ClCompile Include="ProbeManager.cpp" />
     <ClCompile Include="ResourceTypes.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -389,6 +390,7 @@
     <ClInclude Include="MatchHandler.h" />
     <ClInclude Include="CommandLine.h" />
     <ClInclude Include="BasicResourceGenerators.h" />
+    <ClInclude Include="ProbeManager.h" />
     <ClInclude Include="ResourceTypes.h" />
   </ItemGroup>
   <ItemGroup>

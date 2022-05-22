@@ -1,44 +1,44 @@
-TYPE OF INTEREST	includes	CPP20 STD
-void		TRUE
-bool		TRUE
-char		TRUE
-char*		TRUE
-short		TRUE
-int		TRUE
-int*		TRUE
-long long		TRUE
-long long*		TRUE
-unsigned char		TRUE
-unsigned char*		TRUE
-unsigned short		TRUE
-unsigned int		TRUE
-unsigned int*		TRUE
-unsigned long long		TRUE
-unsigned long long*		TRUE
-string	string	TRUE
-array<int,8>	array	TRUE
-vector<int>	vector	TRUE
-deque<int>	deque	TRUE
-list<int>	list	TRUE
-forward_list<int>	forward_list	TRUE
-set<int>	set	TRUE
-multiset<int>	set	TRUE
-map<int,int>	map	TRUE
-multimap<int,int>	map	TRUE
-unordered_set<int>	unordered_set	TRUE
-unordered_multiset<int>	unordered_set	TRUE
-unordered_map<int,int>	unordered_map	TRUE
-unordered_multimap<int,int>	unordered_map	TRUE
-array<bool,8>	array	TRUE
-vector<bool>	vector	TRUE
-deque<bool>	deque	TRUE
-list<bool>	list	TRUE
-forward_list<bool>	forward_list	TRUE
-set<bool>	set	TRUE
-multiset<bool>	set	TRUE
-map<bool,bool>	map	TRUE
-multimap<bool,bool>	map	TRUE
-unordered_set<bool>	unordered_set	TRUE
-unordered_multiset<bool>	unordered_set	TRUE
-unordered_map<bool,bool>	unordered_map	TRUE
-unordered_multimap<bool,bool>	unordered_map	TRUE
+TYPE OF INTEREST	includes	CPP20 STD		
+void		TRUE		
+bool		TRUE		
+char		TRUE		
+char*		TRUE		
+short		TRUE		
+int		TRUE		
+int*		TRUE		
+long long		TRUE		
+long long*		TRUE		
+unsigned char		TRUE		
+unsigned char*		TRUE		
+unsigned short		TRUE		
+unsigned int		TRUE		
+unsigned int*		TRUE		
+unsigned long long		TRUE		
+unsigned long long*		TRUE		
+std::string	string	TRUE		std::string
+std::array<int,8>	array	TRUE		std::array<int,8>
+std::vector<int>	vector	TRUE		std::vector<int>
+std::deque<int>	deque	TRUE		std::deque<int>
+std::list<int>	list	TRUE		std::list<int>
+std::forward_list<int>	forward_list	TRUE		std::forward_list<int>
+std::set<int>	set	TRUE		std::set<int>
+std::multiset<int>	set	TRUE		std::multiset<int>
+std::map<int,int>	map	TRUE		std::map<int,int>
+std::multimap<int,int>	map	TRUE		std::multimap<int,int>
+std::unordered_set<int>	unordered_set	TRUE		std::unordered_set<int>
+std::unordered_multiset<int>	unordered_set	TRUE		std::unordered_multiset<int>
+std::unordered_map<int,int>	unordered_map	TRUE		std::unordered_map<int,int>
+std::unordered_multimap<int,int>	unordered_map	TRUE		std::unordered_multimap<int,int>
+std::array<bool,8>	array	TRUE		std::array<bool,8>
+std::vector<bool>	vector	TRUE		std::vector<bool>
+std::deque<bool>	deque	TRUE		std::deque<bool>
+std::list<bool>	list	TRUE		std::list<bool>
+std::forward_list<bool>	forward_list	TRUE		std::forward_list<bool>
+std::set<bool>	set	TRUE		std::set<bool>
+std::multiset<bool>	set	TRUE		std::multiset<bool>
+std::map<bool,bool>	map	TRUE		std::map<bool,bool>
+std::multimap<bool,bool>	map	TRUE		std::multimap<bool,bool>
+std::unordered_set<bool>	unordered_set	TRUE		std::unordered_set<bool>
+std::unordered_multiset<bool>	unordered_set	TRUE		std::unordered_multiset<bool>
+std::unordered_map<bool,bool>	unordered_map	TRUE		std::unordered_map<bool,bool>
+std::unordered_multimap<bool,bool>	unordered_map	TRUE		std::unordered_multimap<bool,bool>

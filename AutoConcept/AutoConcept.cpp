@@ -43,6 +43,7 @@
 #include <iostream>
 #include <concepts>
 #include <functional>
+#include <vector>
 
 #include "AutoConcept.h"
 #include "Matchers.h"
@@ -133,20 +134,40 @@ namespace auto_concept {
            // if (pass == 0) outs().tie(&throwArayStdOut);
             //else outs().tie(savedStdOut);
 
-            
-
             // Prepare for testing
-            int argc = 7;
             const std::string virtualFileIn = "VirtualInFile.cpp";
             const std::string virtualFileIn2 = "VirtualInFile2.cpp";
             const std::string virtualSuffix = "VirtualOut";
             const std::string virtualFileOut = virtualFileIn + virtualSuffix;
             const std::string suffixRewriteArg = "-rewrite-suffix=" + virtualSuffix;
-            const char* argv[] = { "AutoConceptTest", virtualFileIn.c_str(),"VirtualInFile.AutoConceptTempFile.cpp",virtualFileIn2.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--extra-arg-before=-std=c++2b","--extra-arg=-Xclang","--extra-arg=-fcolor-diagnostics","--"};
+            const std::string injectionSuffix = "AutoConceptTempFile";
+            std::vector<const char*> arguments = { "AutoConceptTest", virtualFileIn.c_str()/*,virtualFileIn2.c_str()*/,"-rewrite",suffixRewriteArg.c_str(),"--extra-arg-before=-std=c++2b","--extra-arg=-ferror-limit=0"};
+            std::vector<std::string> injectedArgs;
+            //const char* argv[] = { "AutoConceptTest", virtualFileIn.c_str(),virtualFileIn2.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--extra-arg-before=-std=c++2b","--extra-arg=-Xclang","--extra-arg=-fcolor-diagnostics","--"};
+            int argc = arguments.size();
+            if (pass == 0) {
+                auto ExpectedParser = CommonOptionsParser::create(argc, arguments.data(), CLOptions::MyToolCategory);
+                if (ExpectedParser && !CLOptions::SkipProbingOption) {
+                    for (const auto& filename: ExpectedParser->getSourcePathList())
+                    {
+                        const std::string newFilename = filename.substr(0, filename.find_last_of('.') + 1) + injectionSuffix + filename.substr(filename.find_last_of('.'));
+                        injectedArgs.push_back(newFilename);
+                        for (auto it = arguments.begin(); it != arguments.end(); it++) {
+                            if (std::string(*it) == filename) {
+                                arguments.insert(it+1, injectedArgs.back().c_str());
+                                break;
+                            }
+                        }
+                        argc++;
+                    }  
+                }
+            }
 
             if (std::filesystem::exists(virtualFileOut)) std::filesystem::remove(virtualFileOut);
-
-            auto ExpectedParser = CommonOptionsParser::create(argc, argv, CLOptions::MyToolCategory);
+            
+            argc = arguments.size();
+            auto ExpectedParser = CommonOptionsParser::create(argc, arguments.data(), CLOptions::MyToolCategory);
+            
             if (!ExpectedParser) {
                 // Fail gracefully for unsupported options.
                 llvm::WithColor color(llvm::errs(), raw_ostream::Colors::RED);
@@ -174,17 +195,21 @@ namespace auto_concept {
             factory.get()->customMatcher = customMatcher;
             factory.get()->customMatchHandler = customMatchHandler;
             factory.get()->resources = resources;
-            //factory.get()->injectingErrors = (pass == 0);
+            if (pass == 0 && !CLOptions::SkipProbingOption) factory.get()->globalState = AutoConceptGlobalState::InjectionPass;
+            else                                            factory.get()->globalState = AutoConceptGlobalState::FinalPass;
+            factory.get()->injectionProbingSuffix = injectionSuffix;
             
             auto result = Tool.run(factory.get());
 
-            if (auto FixedVirtualFile = Tool.getFiles().getVirtualFileSystem().openFileForRead(virtualFileOut)) {
-                if (auto FixedVirtualFileBuffer = FixedVirtualFile.get().get()->getBuffer(virtualFileOut)) {
-                    virtualFile = FixedVirtualFileBuffer.get().get()->getBuffer().str();
+            if (pass == 1) {
+                if (auto FixedVirtualFile = Tool.getFiles().getVirtualFileSystem().openFileForRead(virtualFileOut)) {
+                    if (auto FixedVirtualFileBuffer = FixedVirtualFile.get().get()->getBuffer(virtualFileOut)) {
+                        virtualFile = FixedVirtualFileBuffer.get().get()->getBuffer().str();
+                    }
                 }
-            }
 
-            if (pass == 1) return result;
+                return result;
+            }
         }
 
         return -1;
