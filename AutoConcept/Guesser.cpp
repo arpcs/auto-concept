@@ -149,7 +149,7 @@ namespace auto_concept {
 
 					if (allGoodExceptMe) {
 
-						// If types interact with each other
+						// If types interact with each other return now
 						if (locOuter->second.validity == Validity::good) return false;
 						if (locOuter->second.validity != Validity::bad) {
 							locOuter->second.validity = Validity::bad;

@@ -8,11 +8,7 @@
 
 namespace auto_concept {
 
-	/*struct ResourceState {
-		bool typesGood = false;
-		bool conceptsGood = false;
-	};*/
-
+	// Types of interest
 	class Type {
 	public:
 		Type(std::string_view line);
@@ -22,6 +18,7 @@ namespace auto_concept {
 		bool cpp20std = false;
 	};
 
+	// Concepts of interest
 	class Concept {
 	public:
 		Concept(std::string_view line);
@@ -38,6 +35,7 @@ namespace auto_concept {
 		std::unordered_set<std::string> passingTypes;
 	};
 
+	// A type holding a 'specialized' concept
 	struct SpecializedConcept {
 		Concept conc;
 		std::string templateParamNames;
@@ -49,12 +47,11 @@ namespace auto_concept {
 	// Main resource handler
 	class Resources {
 	public:
-		//ResourceState resourceState;
+
 		Resources(std::string_view typesFilename = "Types.txt", std::string_view conceptsFilename = "Concepts.txt");
 		void Save(std::string_view typesFilename = "Types.txt", std::string_view conceptsFilename = "Concepts.txt");
 
 		std::string typesFirstRow, conceptsFirstRow;
-
 		std::vector<Type> types;
 		std::vector<Concept> concepts;
 	};
