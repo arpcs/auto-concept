@@ -74,10 +74,6 @@ namespace auto_concept {
         /// Creates the Consumer instance, forwarding the command line options.
         ASTConsumerPointer CreateASTConsumer(clang::CompilerInstance& Compiler,
             llvm::StringRef Filename) override {
-           // Compiler.getDiagnostics().setSuppressAllDiagnostics(true);
-    
-
-            //Compiler.getSema().CheckFunctionTemplateSpecialization;
             return std::make_unique<Consumer>(DoRewrite, RewriteSuffix, customMatcher, customMatchHandler, resources, tuState, guessers);
         }
 
@@ -98,10 +94,9 @@ namespace auto_concept {
 
 
     using namespace clang;
-    /// A custom \c FrontendActionFactory so that we can pass the options
-    /// to the constructor of the tool.
+    /// A custom \c FrontendActionFactory so that we can pass the options to the constructor of the tool.
     class ToolFactory : public clang::tooling::FrontendActionFactory {
-        AutoConceptTuState tuState;
+        AutoConceptTuState tuState = AutoConceptTuState::ActingOnResults;
         int fileIndex = -1;
         GuesserCollection& guesserCollection;
     public:
@@ -143,9 +138,8 @@ namespace auto_concept {
             Compiler.setInvocation(std::move(Invocation));
             Compiler.setFileManager(Files);
 
-            // The FrontendAction can have lifetime requirements for Compiler or its
-            // members, and we need to ensure it's deleted earlier than Compiler. So we
-            // pass it to an std::unique_ptr declared after the Compiler variable.
+            // The FrontendAction can have lifetime requirements for Compiler or its members, and we need to ensure it's deleted earlier than Compiler.
+            // So we pass it to an std::unique_ptr declared after the Compiler variable.
             std::unique_ptr<FrontendAction> ScopedToolAction(create());
 
             // Create the compiler's actual diagnostics engine.

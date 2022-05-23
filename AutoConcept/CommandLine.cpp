@@ -96,10 +96,6 @@ namespace auto_concept {
             llvm::cl::NumOccurrencesFlag(llvm::cl::ZeroOrMore),
             llvm::cl::desc("Ignores the following type when choosing concepts"),
             llvm::cl::cat(MyToolCategory));
-        /*llvm::cl::opt<int> CLOptions::MinPreventOption("min-prevent",
-            llvm::cl::init(0),
-            llvm::cl::desc("Min number of specialization types the genereted concept should disallow"),
-            llvm::cl::cat(MyToolCategory));*/
         llvm::cl::opt<int> CLOptions::MaxPreventOption("max-prevent",
             llvm::cl::init(0),
             llvm::cl::desc("Max number of semantically correct specializations the genereted concept is allowed to prevent"),

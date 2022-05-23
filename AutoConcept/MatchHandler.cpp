@@ -182,21 +182,6 @@ namespace auto_concept {
                         Guesser::SpecTypes specParamObj;
                         for (const auto& param : specParams->asArray()) {
                             auto fullType = param.getAsType().getCanonicalType().getAsString();
-                            /*while (true) {
-                                auto pos = fullType.find("std::");
-                                if (pos == string::npos) break;
-                                fullType = fullType.substr(0, pos) + fullType.substr(pos + "std::"s.size());
-                            }
-                            while (true) {
-                                auto pos = fullType.find("class");
-                                if (pos == string::npos) break;
-                                fullType = fullType.substr(0, pos) + fullType.substr(pos + "class"s.size());
-                            }
-                            while (true) {
-                                auto pos = fullType.find(' ');
-                                if (pos == string::npos) break;
-                                fullType = fullType.substr(0, pos) + fullType.substr(pos + " "s.size());
-                            }*/
                             specParamObj.types.push_back(fullType);
                         }
 

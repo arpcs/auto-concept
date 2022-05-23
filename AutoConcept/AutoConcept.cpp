@@ -98,28 +98,9 @@ namespace auto_concept {
         std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher,
         std::function<void(const MatchFinder::MatchResult&)>     customMatchHandler) {
 
-        /*FILE* asdf, * asdf2;
-        auto pastErr = stderr;
-        auto pastOut = stdout;
-        fflush(stdout);
-        fflush(stderr);
-        //auto err1= freopen_s(&asdf, "myfile.txt", "w", stdout);
-        auto err2 = freopen_s(&asdf2, "myfile2.txt", "w", stderr);*/
-        /*fclose(asdf);
-        fclose(asdf2);
-        freopen_s(&asdf,"CONOUT$", "w", stdout);
-        freopen_s(&asdf2,"CONOUT$", "w", stderr);
-        fflush(stdout);
-        fflush(stderr);*/
-
         auto resources = std::make_shared<Resources>();
         GuesserCollection guesserCollection;
-       // llvm::raw_null_ostream throwArayStdOut{};
-        //auto savedStdOut = &outs();
         for (int pass = 0; pass < 2; pass++) {
-
-           // if (pass == 0) outs().tie(&throwArayStdOut);
-            //else outs().tie(savedStdOut);
 
             // Prepare for testing
             std::string virtualFileIn = "VirtualInFile";
@@ -128,15 +109,12 @@ namespace auto_concept {
             virtualFileIn += ".cpp";
             const std::string suffixRewriteArg = "-rewrite-suffix=" + virtualSuffix;
             const std::string injectionSuffix = "AutoConceptTempFile";
-            std::vector<const char*> arguments = { "AutoConceptTest", virtualFileIn.c_str()/*,virtualFileIn2.c_str()*/,"-rewrite",suffixRewriteArg.c_str(),"--extra-arg-before=-std=c++2b","--extra-arg=-ferror-limit=0"};
-            //arguments.push_back("-test-concept=random_access_range");
-            //arguments.push_back("-test-concept=integral");
-            
+            std::vector<const char*> arguments = { "AutoConceptTest", virtualFileIn.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--extra-arg-before=-std=c++2b","--extra-arg=-ferror-limit=0"};
+
             for(const auto& arg: args) arguments.push_back(arg.c_str());
 
             arguments.push_back("--");
             std::vector<std::string> injectedArgs;
-            //const char* argv[] = { "AutoConceptTest", virtualFileIn.c_str(),virtualFileIn2.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--extra-arg-before=-std=c++2b","--extra-arg=-Xclang","--extra-arg=-fcolor-diagnostics","--"};
             int argc = arguments.size();
             if (pass == 0 && !customMatcher && !customMatchHandler) {
                 auto ExpectedParser = CommonOptionsParser::create(argc, arguments.data(), CLOptions::MyToolCategory);
@@ -180,15 +158,12 @@ namespace auto_concept {
             }
 
 
-
             CommonOptionsParser& OptionsParser = ExpectedParser.get();
             ClangTool    Tool(OptionsParser.getCompilations(),
                 OptionsParser.getSourcePathList(),
                 std::make_shared<PCHContainerOperations>(),
                 llvm::vfs::getRealFileSystem()
             );
-
-            
 
 
             // Map the string reference to a virtual file when testing

@@ -35,7 +35,6 @@ namespace auto_concept {
 			}
 			lastProgress += percentageSkip;
 		}
-		//if (numberOfSteps <= currentSteps) End();
 	}
 
 }

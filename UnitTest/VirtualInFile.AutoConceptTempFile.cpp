@@ -15,7 +15,7 @@ namespace UNIQUE_NS {
 	template<class T1>
 	void foo(T1 x)
 	{
-		x[2];
+		x <<= 2;
 	}
 }
 #include<string_view>

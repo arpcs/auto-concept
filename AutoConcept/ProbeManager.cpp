@@ -73,9 +73,6 @@ namespace auto_concept {
         if (matches.size() > 0 && matches.begin()->second.size() > 0 && matches.begin()->second.begin()->Context != nullptr) {
             auto& diag = matches.begin()->second.begin()->Context->getDiagnostics();
 
-            //if (CLOptions::LogLevelOption < 1) diag.setSuppressAllDiagnostics(true);
-
-
             string includeTxt;
             unordered_set<string> includes;
             fileStartPos =   diag.getSourceManager().getLocForStartOfFile(diag.getSourceManager().getMainFileID());
@@ -87,8 +84,6 @@ namespace auto_concept {
                 if (include.size() == 0) continue;
                 includeTxt += "#include<" + include + ">\n";
             }
-            // Since we changed the number of lines, only needed if we add to the begining
-            // includeTxt += "#line 1\n";
             auto FixItInclude = FixItHint::CreateInsertion(fileEndPos, includeTxt);
             const auto diagIDInclude = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Writing AutoConcept include probes");
             {
@@ -168,16 +163,9 @@ namespace auto_concept {
 
                     funcTemp->getLocation();
 
-                    // Since we changed the number of lines
-                    auto endLoc = fileEndPos; //funcTemp->getEndLoc().getLocWithOffset(1);
-                    FullSourceLoc FullLocation = firstContext->getFullLoc(endLoc);
-                    string lineNumText = "";// "\n#line " + to_string(FullLocation.getLineNumber()) + "\n";
 
-                    string finalText = startText + lines + endText + lineNumText;
-
-                    //finalText = "asdfgg";
-
-
+                    auto endLoc = fileEndPos;
+                    string finalText = startText + lines + endText;
 
                     auto FixIt = FixItHint::CreateInsertion(endLoc, finalText);
 

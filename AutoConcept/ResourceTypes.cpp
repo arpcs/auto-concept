@@ -41,9 +41,6 @@ namespace auto_concept {
 		return res;
 	}
 
-
-
-	//CONCEPT NAME	DESCRIPTION	# ARGUMENTS	INCLUDES 	EXPOSITION ONLY	CPP20 STD	IS CONCEPT	PASSING TYPES
 	Concept::Concept(string_view line){
 		size_t startLoc = 0, tabLoc = 0, colonLoc = 0;
 
