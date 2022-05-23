@@ -64,8 +64,7 @@ namespace auto_concept {
             Consume();
         }
 
-        void HandleTranslationUnit(clang::ASTContext& Context) override {
-            matchFinder.matchAST(Context);
-        }
+        void HandleTranslationUnit(clang::ASTContext& Context) override;
+
     };
 }

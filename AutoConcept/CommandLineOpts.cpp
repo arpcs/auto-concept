@@ -42,7 +42,7 @@
 #include <iostream>
 #include <concepts>
 
-#include "CommandLine.h"
+#include "CommandLineOpts.h"
 
 
 namespace auto_concept {
@@ -61,6 +61,7 @@ namespace auto_concept {
         // It's nice to have this help message in all tools.
         extrahelp CLOptions::CommonHelp(CommonOptionsParser::HelpMessage);
 
+        // Boolean options
         llvm::cl::opt<bool> CLOptions::RewriteOption("rewrite",
             llvm::cl::init(false),
             llvm::cl::desc("If set, emits rewritten source code"),
@@ -69,32 +70,19 @@ namespace auto_concept {
             llvm::cl::init(false),
             llvm::cl::desc("If set, skips probing templates for valid arguments"),
             llvm::cl::cat(MyToolCategory));
-        llvm::cl::opt<std::string> CLOptions::RewriteSuffixOption("rewrite-suffix",
-            llvm::cl::desc("If -rewrite is set, changes will be rewritten to a file with the same name, but this suffix"),
-            llvm::cl::cat(MyToolCategory));
-
         llvm::cl::opt<bool> CLOptions::GenerateResourcesOption("generate-resources",
             llvm::cl::init(false),
             llvm::cl::desc("If set, the program will generate new resources files, call this whenever Types.txt or Concepts.txt was changed"),
             llvm::cl::cat(MyToolCategory));
-
-        llvm::cl::opt<int> CLOptions::LogLevelOption("log-level",
-            llvm::cl::init(0),
-            llvm::cl::desc("Logging level from 0 to 3, the lower the value the less details the program gives. ( 3 reports injected errors )"),
-            llvm::cl::cat(MyToolCategory));
-
         llvm::cl::opt<bool> CLOptions::KeepTempFilesOption("keep-temp-files",
             llvm::cl::init(false),
             llvm::cl::desc("If set, the program won't delete the generated temp files"),
             llvm::cl::cat(MyToolCategory));
 
-        llvm::cl::list<std::string> CLOptions::TestConceptOption("test-concept",
-            llvm::cl::NumOccurrencesFlag(llvm::cl::ZeroOrMore),
-            llvm::cl::desc("Print why the given concept wasn't considered"),
-            llvm::cl::cat(MyToolCategory));
-        llvm::cl::list<std::string> CLOptions::IgnoreTypeOption("ignore-type",
-            llvm::cl::NumOccurrencesFlag(llvm::cl::ZeroOrMore),
-            llvm::cl::desc("Ignores the following type when choosing concepts"),
+        // Int options
+        llvm::cl::opt<int> CLOptions::LogLevelOption("log-level",
+            llvm::cl::init(0),
+            llvm::cl::desc("Logging level from 0 to 3, the lower the value the less details the program gives. ( 3 reports injected errors )"),
             llvm::cl::cat(MyToolCategory));
         llvm::cl::opt<int> CLOptions::MaxPreventOption("max-prevent",
             llvm::cl::init(0),
@@ -105,6 +93,20 @@ namespace auto_concept {
             llvm::cl::desc("Max number of semantically incorrect specializations the genereted concept could allow"),
             llvm::cl::cat(MyToolCategory));
 
+        // String options
+        llvm::cl::opt<std::string> CLOptions::RewriteSuffixOption("rewrite-suffix",
+            llvm::cl::desc("If -rewrite is set, changes will be rewritten to a file with the same name, but this suffix"),
+            llvm::cl::cat(MyToolCategory));
+        llvm::cl::list<std::string> CLOptions::TestConceptOption("test-concept",
+            llvm::cl::NumOccurrencesFlag(llvm::cl::ZeroOrMore),
+            llvm::cl::desc("Print why the given concept wasn't considered"),
+            llvm::cl::cat(MyToolCategory));
+        llvm::cl::list<std::string> CLOptions::IgnoreTypeOption("ignore-type",
+            llvm::cl::NumOccurrencesFlag(llvm::cl::ZeroOrMore),
+            llvm::cl::desc("Ignores the following type when choosing concepts"),
+            llvm::cl::cat(MyToolCategory));
+
+        // Option aliases
         llvm::cl::alias CLOptions::RewriteSuffixOptionAlias("x",
             llvm::cl::desc("Alias for rewrite-suffix option"),
             llvm::cl::aliasopt(CLOptions::RewriteSuffixOption)

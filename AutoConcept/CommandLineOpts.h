@@ -91,8 +91,7 @@ namespace auto_concept {
         /// Constructor.
         ///
         /// The \p RewriteSuffix is the option from the command line.
-        explicit FixItRewriterOptions(const std::string& RewriteSuffix)
-            : RewriteSuffix(RewriteSuffix) {
+        explicit FixItRewriterOptions(const std::string& RewriteSuffix) : RewriteSuffix(RewriteSuffix) {
             super::InPlace = false;
         }
 

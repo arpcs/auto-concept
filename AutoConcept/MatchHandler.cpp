@@ -43,7 +43,7 @@
 #include <iostream>
 #include <concepts>
 
-#include "CommandLine.h"
+#include "CommandLineOpts.h"
 #include "MatchHandler.h"
 #include "Guesser.h"
 

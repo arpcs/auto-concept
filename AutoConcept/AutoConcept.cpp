@@ -49,11 +49,12 @@
 #include "Matchers.h"
 #include "MatchHandler.h"
 #include "Consumer.h"
-#include "CommandLine.h"
+#include "CommandLineOpts.h"
 #include "FrontendAction.h"
 #include "ResourceTypes.h"
 #include "BasicResourceGenerators.h"
 #include "Guesser.h"
+#include "ToolFactory.h"
 
 
 namespace auto_concept {

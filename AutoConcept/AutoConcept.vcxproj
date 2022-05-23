@@ -294,7 +294,7 @@
       <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MinimalRebuild>
       <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</MinimalRebuild>
     </ClCompile>
-    <ClCompile Include="CommandLine.cpp" />
+    <ClCompile Include="CommandLineOpts.cpp" />
     <ClCompile Include="ConsoleHelpers.cpp" />
     <ClCompile Include="Consumer.cpp" />
     <ClCompile Include="Guesser.cpp" />
@@ -303,6 +303,7 @@
     <ClCompile Include="BasicResourceGenerators.cpp" />
     <ClCompile Include="ProbeManager.cpp" />
     <ClCompile Include="ResourceTypes.cpp" />
+    <ClCompile Include="ToolFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoConcept.h" />
@@ -312,10 +313,11 @@
     <ClInclude Include="Guesser.h" />
     <ClInclude Include="Matchers.h" />
     <ClInclude Include="MatchHandler.h" />
-    <ClInclude Include="CommandLine.h" />
+    <ClInclude Include="CommandLineOpts.h" />
     <ClInclude Include="BasicResourceGenerators.h" />
     <ClInclude Include="ProbeManager.h" />
     <ClInclude Include="ResourceTypes.h" />
+    <ClInclude Include="ToolFactory.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Concepts.txt" />

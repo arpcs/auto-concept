@@ -47,54 +47,40 @@
 #include <concepts>
 #include <functional>
 
-#include "Consumer.h"
 #include "Guesser.h"
 #include "CommandLineOpts.h"
 #include "ResourceTypes.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include <clang/Sema/Sema.h>
+#include "AutoConcept.h"
+#include "FrontendAction.h"
 
 namespace auto_concept {
 
-    /// Creates an `ASTConsumer` that defines the matcher.
-    class Action : public clang::ASTFrontendAction {
-    public:
-        using ASTConsumerPointer = std::unique_ptr<clang::ASTConsumer>;
+    /// A custom \c FrontendActionFactory so that we can pass the options to the constructor of the tool.
+    class ToolFactory : public clang::tooling::FrontendActionFactory {
+        using MatchFinder = clang::ast_matchers::MatchFinder;
         using MatchFinder = clang::ast_matchers::MatchFinder;
 
-        /// Constructor, taking the \p RewriteOption and \p RewriteSuffixOption.
-        Action(bool DoRewrite, const std::string& RewriteSuffix,
-            std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher,
-            std::function<void(const MatchFinder::MatchResult&)> customMatchHandler,
-            std::shared_ptr<Resources> resources,AutoConceptTuState tuState,
-            GuesserCollection::InnerType guessers)
-            : DoRewrite(DoRewrite), RewriteSuffix(RewriteSuffix), customMatcher(customMatcher), 
-            customMatchHandler(customMatchHandler), resources{ resources }, tuState{ tuState }, guessers{ guessers }
-        {}
-
-        /// Creates the Consumer instance, forwarding the command line options.
-        ASTConsumerPointer CreateASTConsumer(clang::CompilerInstance& Compiler,
-            llvm::StringRef Filename) override {
-            return std::make_unique<Consumer>(DoRewrite, RewriteSuffix, customMatcher, customMatchHandler, resources, tuState, guessers);
-        }
-
-    private:
-        // Custom mather and handler for convenience
+        AutoConceptTuState tuState = AutoConceptTuState::ActingOnResults;
+        int fileIndex = -1;
+        GuesserCollection& guesserCollection;
+    public:
+        using MatchFinder = clang::ast_matchers::MatchFinder;
         std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher;
         std::function<void(const MatchFinder::MatchResult&)> customMatchHandler;
         std::shared_ptr<Resources> resources;
-        AutoConceptTuState tuState;
-        GuesserCollection::InnerType guessers;
+        std::string injectionProbingSuffix = "AutoConceptTempFile";
+        AutoConceptGlobalState globalState = AutoConceptGlobalState::FinalPass;
 
-        /// Whether we want to rewrite files. Forwarded to the consumer.
-        bool DoRewrite;
+        std::unique_ptr<clang::FrontendAction> create() override;
 
-        /// The suffix for rewritten files. Forwarded to the consumer.
-        std::string RewriteSuffix;
+        ToolFactory(GuesserCollection& guesserCollection) :guesserCollection{ guesserCollection } { }
+
+        bool runInvocation(
+            std::shared_ptr<clang::CompilerInvocation> Invocation, clang::FileManager* Files,
+            std::shared_ptr<clang::PCHContainerOperations> PCHContainerOps,
+            clang::DiagnosticConsumer* DiagConsumer) override;
+
     };
-
-
-
-    
-
 }

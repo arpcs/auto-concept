@@ -45,7 +45,7 @@
 #include <concepts>
 #include <functional>
 
-#include "CommandLine.h"
+#include "CommandLineOpts.h"
 #include "ResourceTypes.h"
 #include "AutoConcept.h"
 #include "Guesser.h"

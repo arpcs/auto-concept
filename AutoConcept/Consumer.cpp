@@ -90,4 +90,7 @@ namespace auto_concept {
 
         }
 
+    void Consumer::HandleTranslationUnit(clang::ASTContext& Context) {
+        matchFinder.matchAST(Context);
+    }
 }

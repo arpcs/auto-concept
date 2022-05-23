@@ -7,7 +7,7 @@
 #include "llvm/ADT/SmallVector.h"
 
 #include "Guesser.h"
-#include "CommandLine.h"
+#include "CommandLineOpts.h"
 
 namespace auto_concept {
 
