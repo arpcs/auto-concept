@@ -12,10 +12,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Matchers">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Resource Generator">
       <UniqueIdentifier>{38c5373b-6f1b-4354-8d99-eb9e4bbacc8d}</UniqueIdentifier>
     </Filter>
@@ -39,17 +35,11 @@
     <ClCompile Include="AutoConcept.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MatchersDeduced.cpp">
-      <Filter>Matchers</Filter>
-    </ClCompile>
     <ClCompile Include="CommandLine.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Consumer.cpp">
       <Filter>Core\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MatchersGuessed.cpp">
-      <Filter>Matchers</Filter>
     </ClCompile>
     <ClCompile Include="ResourceTypes.cpp">
       <Filter>Resource Generator\Source Files</Filter>
@@ -67,6 +57,9 @@
       <Filter>Resource Generator\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ProbeManager.cpp">
+      <Filter>Core\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Matchers.cpp">
       <Filter>Core\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
