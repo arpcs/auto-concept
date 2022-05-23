@@ -78,7 +78,7 @@ namespace auto_concept {
         static llvm::cl::extrahelp MoreHelp;
 
         template<typename T, typename ValT>
-        static inline bool contains(T& optionList, ValT& val) {
+        static bool contains(T& optionList, ValT& val) {
             return std::find(optionList.begin(), optionList.end(), val) != optionList.end();
         }
     };

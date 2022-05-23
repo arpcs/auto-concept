@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "gtest/gtest.h"
+#include <iostream>
 
 namespace auto_concept_test {
 
@@ -13,8 +14,10 @@ namespace auto_concept_test {
 
 		TestReader reader("RewriteTestsDeduced.cpp");
 
+		int counter = 0;
 		for (auto& testCase : reader)
 		{
+			std::cout << std::endl << "[Starting "<< ++counter << ". Concept Rewrite Test]" << std::endl << std::endl;
 			EXPECT_EQ(runner(testCase.test, testCase.commandArgs), testCase.expected);
 		}
 
