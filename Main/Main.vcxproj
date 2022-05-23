@@ -150,7 +150,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\llvm-project\clang\include;C:\llvm-project\llvm\include;C:\llvm-project\build\include;C:\llvm-project\build\tools\clang\include;%(AdditionalIncludeDirectories);$(IncludePath)</IncludePath>
     <TargetName>AutoConcept</TargetName>
-    <LibraryPath>C:\llvm-project\build\Debug\lib;C:\llvm-project\build\Debug\bin;.\x64\Debug;%UserProfile%\source\repos\AutoConcept\x64\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\llvm-project\build\Debug\lib;C:\llvm-project\build\Debug\bin;%UserProfile%\source\repos\AutoConcept\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugFast|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -161,7 +161,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\llvm-project\clang\include;C:\llvm-project\llvm\include;C:\llvm-project\build\include;C:\llvm-project\build\tools\clang\include;%(AdditionalIncludeDirectories);$(IncludePath)</IncludePath>
-    <LibraryPath>C:\llvm-project\build\RelWithDebInfo\lib;C:\llvm-project\build\RelWithDebInfo\bin;.\x64\Release;%UserProfile%\source\repos\AutoConcept\x64\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\llvm-project\build\RelWithDebInfo\lib;C:\llvm-project\build\RelWithDebInfo\bin;%UserProfile%\source\repos\AutoConcept\x64\Release;$(LibraryPath)</LibraryPath>
     <TargetName>AutoConcept</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseFast|x64'">

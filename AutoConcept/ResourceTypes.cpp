@@ -7,6 +7,7 @@
 #include <string_view>
 #include <fstream>
 #include <unordered_set>
+#include <filesystem>
 
 namespace auto_concept {
 	using namespace std;
@@ -147,8 +148,18 @@ namespace auto_concept {
 		string fileName;
 		for (int i = 0; i < 2; i++)
 		{
-			if (i == 0) fileName = "../AutoConcept/" + string{ typesFilename };
-			else		fileName = "../AutoConcept/" + string{ conceptsFilename };
+			if (std::filesystem::exists(string{ typesFilename })) {
+				if (i == 0) fileName = string{ typesFilename };
+				else		fileName = string{ conceptsFilename };
+			}
+			if (std::filesystem::exists("../AutoConcept/" + string{ typesFilename })) {
+				if (i == 0) fileName = "../AutoConcept/" + string{ typesFilename };
+				else		fileName = "../AutoConcept/" + string{ conceptsFilename };
+			}
+			if (std::filesystem::exists("../../AutoConcept/" + string{ typesFilename })) {
+				if (i == 0) fileName = "../../AutoConcept/" + string{ typesFilename };
+				else		fileName = "../../AutoConcept/" + string{ conceptsFilename };
+			}
 			ifstream file(fileName);
 			if (!file.is_open()) {
 				llvm::errs() << "ERROR: Can't open resources file!\n";
@@ -174,8 +185,19 @@ namespace auto_concept {
 		string fileName;
 		for (int i = 0; i < 2; i++)
 		{
-			if (i == 0) fileName = "../AutoConcept/" + string{ typesFilename };
-			else		fileName = "../AutoConcept/" + string{ conceptsFilename };
+			if (std::filesystem::exists(string{ typesFilename })) {
+				if (i == 0) fileName = string{ typesFilename };
+				else		fileName = string{ conceptsFilename };
+			}
+			if (std::filesystem::exists("../AutoConcept/" + string{ typesFilename })) {
+				if (i == 0) fileName = "../AutoConcept/" + string{ typesFilename };
+				else		fileName = "../AutoConcept/" + string{ conceptsFilename };
+			}
+			if (std::filesystem::exists("../../AutoConcept/" + string{ typesFilename })) {
+				if (i == 0) fileName = "../../AutoConcept/" + string{ typesFilename };
+				else		fileName = "../../AutoConcept/" + string{ conceptsFilename };
+			}
+
 			ofstream file(fileName);
 			if (!file.is_open()) {
 				llvm::errs() << "ERROR: Can't write resources file!\n";

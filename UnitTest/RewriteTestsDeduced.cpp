@@ -1,29 +1,4 @@
-/*
-//Test
-namespace UNIQUE_NS {
-	template<class T1, class T2, class TWrong>
-	bool isfinite(T1 x, T2 y, TWrong z)
-	{
-		constexpr auto maxVal = std::numeric_limits<T1>::max();
-		constexpr auto minVal = std::numeric_limits<T2>::min();
-		return x <= maxVal && x >= -maxVal;
-	}
-	void test() { isfinite(5, 6, 7); }
-}
-//Expected
-namespace UNIQUE_NS {
-	template<class T1, class T2, class TWrong>
-	requires std::is_arithmetic_v<T1> && std::is_arithmetic_v<T2>
-	bool isfinite(T1 x, T2 y, TWrong z)
-	{
-		constexpr auto maxVal = std::numeric_limits<T1>::max();
-		constexpr auto minVal = std::numeric_limits<T2>::min();
-		return x <= maxVal && x >= -maxVal;
-	}
-	void test() { isfinite(5, 6, 7); }
-}
-*/
-// Setup
+// [Setup]
 #define CONCAT_INDIRECT(x, y) x ## y
 #define CONCAT(x, y) CONCAT_INDIRECT(x, y)
 #define UNIQUE_NS CONCAT(AUTO_CONCEPT_TEST_UNIQUE_NAMESPACE , __LINE__ )
@@ -33,53 +8,90 @@ namespace UNIQUE_NS {
 #include <ranges>
 #include <string>
 #include <array>
+#include <bitset>
 using namespace std;
 using namespace ranges;
 
-// Test
+// [Test]
+// [Comment] Testing random acces range
+// [Arg] -ignore-type=class std::initializer_list<int>
+// [Arg] -test-concept=random_access_range
+// [Arg] -test-concept=contiguous_range
 namespace UNIQUE_NS {
-	template<class T1, class T2>
-	bool foo(T1 x, T2 y)
+	template<class T1>
+	void foo(T1 x)
 	{
-		if (x[5]) return false;
-		return true;
-	}
-
-	void test() {
-		//foo(std::vector<int>{}, int{});
-		foo<std::string, int>({}, {});
-		foo<std::vector<int>, int>({}, {});
-		foo<int,int>({}, {});
-		//foo(1, 1);
-		//foo(1, std::vector<int>{1});
+		x[2];
 	}
 }
+// [Expected]
+// [Comment] This can still be a bitset so it shouldn't add concept
 namespace UNIQUE_NS {
-	template<class T1, class T2>
-	bool foo2(T1 x, T2 y)
+	template<class T1>
+	void foo(T1 x)
 	{
-		if (x[5]) return false;
-		return true;
-	}
-	void test() {
-		//foo(std::vector<int>{}, int{});
-		foo2<std::vector<int>, int>({}, {});
-		foo2<std::string, int>({}, {});
-		//foo(1, 1);
-		//foo(1, std::vector<int>{1});
+		x[2];
 	}
 }
-// Expected
+// [Expected]
+// [Comment] Now it should
+// [Arg] -ignore-type=class std::bitset<4>
 namespace UNIQUE_NS {
-	template<class T1, class T2>
-	requires contiguous_range<T1> && signed_integral<T2> 
-	bool foo(T1 x, T2 y)
+	template<class T1>
+	requires random_access_range<T1>
+	void foo(T1 x)
 	{
-		if (x[5]) return false;
-		return true;
+		x[2];
 	}
-	void test() {
-		foo(std::vector<int>{1}, 1);
-		foo(1, 1);
+}
+// [Test]
+// [Comment] Testing random acces range with comparison
+// [Arg] -ignore-type=class std::initializer_list<int>
+namespace UNIQUE_NS {
+	template<class T1>
+	void foo(T1 x)
+	{
+		x < x;
+		x[2];
+	}
+}
+// [Expected]
+// [Comment] Now this can't be a bitset
+namespace UNIQUE_NS {
+	template<class T1>
+	requires random_access_range<T1>
+	void foo(T1 x)
+	{
+		x < x;
+		x[2];
+	}
+}
+// [Test]
+// [Comment] Testing integral point
+namespace UNIQUE_NS {
+	template<class T1>
+	void foo(T1 x)
+	{
+		x <<= 2;
+	}
+}
+// [Expected]
+// [Comment] Now this again can be a bitset so we should get nothing
+namespace UNIQUE_NS {
+	template<class T1>
+	void foo(T1 x)
+	{
+		x <<= 2;
+	}
+}
+// [Expected]
+// [Arg] -ignore-type=class std::bitset<4>
+// [Comment] Now we should
+namespace UNIQUE_NS {
+	template<class T1>
+	requires integral<T1>
+	void foo(T1 x)
+	{
+		x <<= 2;
 	}
 }

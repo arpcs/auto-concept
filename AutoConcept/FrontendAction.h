@@ -47,6 +47,7 @@
 #include <concepts>
 #include <functional>
 
+#include "Guesser.h"
 #include "CommandLine.h"
 #include "ResourceTypes.h"
 #include "clang/Frontend/CompilerInstance.h"
@@ -64,10 +65,10 @@ namespace auto_concept {
         Action(bool DoRewrite, const std::string& RewriteSuffix,
             std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher,
             std::function<void(const MatchFinder::MatchResult&)> customMatchHandler,
-            std::shared_ptr<Resources> resources,
-            AutoConceptTuState tuState)
+            std::shared_ptr<Resources> resources,AutoConceptTuState tuState,
+            GuesserCollection::InnerType guessers)
             : DoRewrite(DoRewrite), RewriteSuffix(RewriteSuffix), customMatcher(customMatcher), 
-            customMatchHandler(customMatchHandler), resources{ resources }, tuState{ tuState }
+            customMatchHandler(customMatchHandler), resources{ resources }, tuState{ tuState }, guessers{ guessers }
         {}
 
         /// Creates the Consumer instance, forwarding the command line options.
@@ -77,7 +78,7 @@ namespace auto_concept {
     
 
             //Compiler.getSema().CheckFunctionTemplateSpecialization;
-            return std::make_unique<Consumer>(DoRewrite, RewriteSuffix, customMatcher, customMatchHandler, resources, tuState);
+            return std::make_unique<Consumer>(DoRewrite, RewriteSuffix, customMatcher, customMatchHandler, resources, tuState, guessers);
         }
 
     private:
@@ -86,6 +87,7 @@ namespace auto_concept {
         std::function<void(const MatchFinder::MatchResult&)> customMatchHandler;
         std::shared_ptr<Resources> resources;
         AutoConceptTuState tuState;
+        GuesserCollection::InnerType guessers;
 
         /// Whether we want to rewrite files. Forwarded to the consumer.
         bool DoRewrite;
@@ -100,6 +102,8 @@ namespace auto_concept {
     /// to the constructor of the tool.
     class ToolFactory : public clang::tooling::FrontendActionFactory {
         AutoConceptTuState tuState;
+        int fileIndex = -1;
+        GuesserCollection& guesserCollection;
     public:
         using MatchFinder = clang::ast_matchers::MatchFinder;
         std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher;
@@ -109,10 +113,12 @@ namespace auto_concept {
         AutoConceptGlobalState globalState = AutoConceptGlobalState::FinalPass;
         std::unique_ptr<clang::FrontendAction> create() override {
             if (tuState == AutoConceptTuState::InjectingProbes) {
-                return std::make_unique<auto_concept::Action>(true, injectionProbingSuffix, customMatcher, customMatchHandler, resources, tuState);
+                return std::make_unique<auto_concept::Action>(true, injectionProbingSuffix, customMatcher, customMatchHandler, resources, tuState, guesserCollection.get(fileIndex));
             }
-            return std::make_unique<auto_concept::Action>(CLOptions::RewriteOption, CLOptions::RewriteSuffixOption, customMatcher, customMatchHandler, resources, tuState);
+            return std::make_unique<auto_concept::Action>(CLOptions::RewriteOption, CLOptions::RewriteSuffixOption, customMatcher, customMatchHandler, resources, tuState, guesserCollection.get(fileIndex));
         }
+
+        ToolFactory(GuesserCollection& guesserCollection) :guesserCollection{ guesserCollection } { }
 
         bool runInvocation(
             std::shared_ptr<CompilerInvocation> Invocation, FileManager* Files,
@@ -125,10 +131,12 @@ namespace auto_concept {
                 tuState = AutoConceptTuState::InjectingProbes;
                 if (Invocation && Invocation->getAnalyzerOpts() && !CLOptions::SkipProbingOption) {
                     const auto cmds = Invocation->getAnalyzerOpts()->FullCompilerInvocation;
-                    if (cmds.find("." + injectionProbingSuffix + ".") != std::string::npos) 
+                    if (cmds.find("." + injectionProbingSuffix + ".") != std::string::npos) {
                         tuState = AutoConceptTuState::CollectingResults;
+                    }
                 }
             }
+            if (CLOptions::SkipProbingOption || tuState == AutoConceptTuState::InjectingProbes || globalState == AutoConceptGlobalState::FinalPass) fileIndex++;
 
             // Create a compiler instance to handle the actual work.
             CompilerInstance Compiler(std::move(PCHContainerOps));
@@ -144,6 +152,10 @@ namespace auto_concept {
             Compiler.createDiagnostics(DiagConsumer, /*ShouldOwnClient=*/false);
             if (!Compiler.hasDiagnostics())
                 return false;
+
+            Compiler.getDiagnostics().Clear();
+            if (tuState == AutoConceptTuState::CollectingResults && CLOptions::LogLevelOption <2) Compiler.getDiagnostics().setSuppressAllDiagnostics(true);
+            else Compiler.getDiagnostics().setSuppressAllDiagnostics(false);
 
             Compiler.createSourceManager(*Files);
 

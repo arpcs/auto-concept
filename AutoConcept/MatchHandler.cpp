@@ -98,9 +98,11 @@ namespace auto_concept {
         auto& map = Result.Nodes.getMap();
 
         for (auto& m : map) {
-            llvm::outs() << "Match found: " << m.first << "\n";
-            m.second.dump(llvm::outs(), *Context);
-            llvm::outs() << "Match end: " << m.first << "\n";
+            if (CLOptions::LogLevelOption >= 3) {
+                llvm::outs() << "Match found: " << m.first << "\n";
+                m.second.dump(llvm::outs(), *Context);
+                llvm::outs() << "Match end: " << m.first << "\n";
+            }
         }
 
         if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl rewrite")) 
@@ -125,7 +127,7 @@ namespace auto_concept {
             }
         }  
         if (this->tuState == AutoConceptTuState::InjectingProbes) InjectProbes(matches, resources);
-        else if (this->tuState == AutoConceptTuState::CollectingResults) {}
+        else if (this->tuState == AutoConceptTuState::CollectingResults) CollectProbes(matches, guessers);
         else if (this->tuState == AutoConceptTuState::ActingOnResults)
         for (auto& matchesPair : matches) {
             auto firstMatch = *matchesPair.second.begin();
@@ -166,18 +168,21 @@ namespace auto_concept {
             
             if (auto* funcTemp = const_cast<clang::FunctionTemplateDecl*>(firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl2"))) {
 
-                Guesser guesser(resources);
+                Guesser guesser;
+                auto fullName = funcTemp->getCanonicalDecl()->getQualifiedNameAsString();
+                if (guessers && guessers.get()->find(fullName) != guessers.get()->end())
+                    guesser = guessers.get()->at(fullName);
                 if (funcTemp->getTemplateParameters()) {
                     for (const auto& param : *funcTemp->getTemplateParameters()) 
                         guesser.templateParams.push_back(param->getName().str());
 
                     for (auto spec : funcTemp->specializations()) {
-                        spec->dumpColor();
+                        if (CLOptions::LogLevelOption >= 3) spec->dumpColor();
                         auto specParams = spec->getTemplateSpecializationArgs();
                         Guesser::SpecTypes specParamObj;
                         for (const auto& param : specParams->asArray()) {
                             auto fullType = param.getAsType().getCanonicalType().getAsString();
-                            while (true) {
+                            /*while (true) {
                                 auto pos = fullType.find("std::");
                                 if (pos == string::npos) break;
                                 fullType = fullType.substr(0, pos) + fullType.substr(pos + "std::"s.size());
@@ -191,15 +196,16 @@ namespace auto_concept {
                                 auto pos = fullType.find(' ');
                                 if (pos == string::npos) break;
                                 fullType = fullType.substr(0, pos) + fullType.substr(pos + " "s.size());
-                            }
+                            }*/
                             specParamObj.types.push_back(fullType);
                         }
 
                         specParamObj.good = !spec->isInvalidDecl();
-                        guesser.templateSpecs.push_back(specParamObj);
+                        guesser.templateSpecs.insert(specParamObj);
                     }
 
-                    auto fitting = guesser.GetFittingConcepts();
+                    if (CLOptions::TestConceptOption.size() > 0) llvm::outs() << "[Test concept] Testing function: " << fullName << "\n";
+                    auto fitting = guesser.GetFittingConcepts(resources);
                     
                     // Rewriting
 
@@ -215,33 +221,33 @@ namespace auto_concept {
                     for (auto f : fitting)
                     {
                         if (f) {
-                            outs() << f->templateParamNames << " : ";
-                            outs() << f->conc.name << "\n";
                             const std::string& paramName = f->templateParamNames;
                             if (i++ != 0) {
-                                replaceText += "&& ";
+                                replaceText += " && ";
                                 noteText += " ";
                             }
-                            replaceText += f->conc.name+"<" + paramName + "> ";
+                            replaceText += f->conc.name+"<" + paramName + ">";
                             noteText += "("+f->conc.name + ")'" + paramName + "'";
                         }
                     }
-                    // ToDo: \t....
-                    auto FixIt = FixItHint::CreateInsertion(funcDecl->getBeginLoc(), replaceText + "\n\t");
-                    auto& diag = firstContext->getDiagnostics();
-                    
-                    const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Consider adding concepts to template(s): %0");
-                    // So we destroy our builder to execute it..
-                    {
-                        const auto& builder = diag.Report(funcTemp->getBeginLoc(), diagID);
-                        builder.AddString(noteText);
-                        builder.AddFixItHint(FixIt);
+                    if (i != 0) {
+                        // ToDo: \t....
+                        auto FixIt = FixItHint::CreateInsertion(funcDecl->getBeginLoc(), replaceText + "\n\t");
+                        auto& diag = firstContext->getDiagnostics();
+
+                        const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Consider adding concepts to template(s): %0");
+                        // So we destroy our builder to execute it..
+                        {
+                            const auto& builder = diag.Report(funcTemp->getBeginLoc(), diagID);
+                            builder.AddString(noteText);
+                            builder.AddFixItHint(FixIt);
+                        }
                     }
                 }
             }
             
         }
-
+        
         if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
     }
 

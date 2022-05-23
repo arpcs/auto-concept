@@ -15,7 +15,7 @@ namespace auto_concept_test {
 
 		for (auto& testCase : reader)
 		{
-			EXPECT_EQ(runner(testCase.test), testCase.expected);
+			EXPECT_EQ(runner(testCase.test, testCase.commandArgs), testCase.expected);
 		}
 
 		EXPECT_TRUE(true);

@@ -66,14 +66,20 @@ namespace auto_concept {
     using MatchResult = MatchFinder::MatchResult;
 
     void InjectProbes(const std::unordered_map< int64_t, clang::SmallVector<MatchResult> >& matches, std::shared_ptr<Resources> resources) {
-        int probeIndex = 0;
 
+        SourceLocation fileEndPos;
+        SourceLocation fileStartPos;
         // Writing includes
         if (matches.size() > 0 && matches.begin()->second.size() > 0 && matches.begin()->second.begin()->Context != nullptr) {
             auto& diag = matches.begin()->second.begin()->Context->getDiagnostics();
+
+            //if (CLOptions::LogLevelOption < 1) diag.setSuppressAllDiagnostics(true);
+
+
             string includeTxt;
             unordered_set<string> includes;
-            SourceLocation fileStartPos = diag.getSourceManager().getLocForStartOfFile(diag.getSourceManager().getMainFileID());
+            fileStartPos =   diag.getSourceManager().getLocForStartOfFile(diag.getSourceManager().getMainFileID());
+            fileEndPos =     diag.getSourceManager().getLocForEndOfFile  (diag.getSourceManager().getMainFileID());
 
             for (const auto& type : resources->types) includes.insert(type.include);
             for (const auto& include : includes)
@@ -81,13 +87,14 @@ namespace auto_concept {
                 if (include.size() == 0) continue;
                 includeTxt += "#include<" + include + ">\n";
             }
-            // Since we changed the number of lines
-            includeTxt += "#line 1\n";
-            auto FixItInclude = FixItHint::CreateInsertion(fileStartPos, includeTxt);
-            const auto diagIDInclude = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Writing AutoConcept include for probes");
+            // Since we changed the number of lines, only needed if we add to the begining
+            // includeTxt += "#line 1\n";
+            auto FixItInclude = FixItHint::CreateInsertion(fileEndPos, includeTxt);
+            const auto diagIDInclude = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Writing AutoConcept include probes");
             {
-                const auto& builder = diag.Report(fileStartPos, diagIDInclude);
+                const auto& builder = diag.Report(fileEndPos, diagIDInclude);
                 builder.AddFixItHint(FixItInclude);
+                builder.setForceEmit();
             }
         }
 
@@ -113,10 +120,11 @@ namespace auto_concept {
                     // This is an arbitrary limitation to reduce complexity
                     if (correctParams == nullptr && minRequiredTemplateArguments > 1) continue;
 
-                    string startText = "\nnamespace AutoConceptProbing" + to_string(probeIndex++) +"{\n\tvoid tester(){\n";
+                    string startText = "\nnamespace AutoConceptProbingID_" + to_string(funcTemp->getID()) +"{\n\tvoid tester(){\n";
                     string inEveryLine = "\t\t";
-                    string endText = "\t\t}\n\t}";
+                    string endText = "\t}\n}";
                     string lines;
+                    //startText+=""
                     int i = 0;
                     auto WriteLine = [&](vector< string > &args) {
                         lines += inEveryLine;
@@ -158,10 +166,12 @@ namespace auto_concept {
                         }
                     }
 
+                    funcTemp->getLocation();
+
                     // Since we changed the number of lines
-                    auto endLoc = funcTemp->getEndLoc().getLocWithOffset(1);
+                    auto endLoc = fileEndPos; //funcTemp->getEndLoc().getLocWithOffset(1);
                     FullSourceLoc FullLocation = firstContext->getFullLoc(endLoc);
-                    string lineNumText = "\n#line "+ to_string(FullLocation.getLineNumber() ) +"\n";
+                    string lineNumText = "";// "\n#line " + to_string(FullLocation.getLineNumber()) + "\n";
 
                     string finalText = startText + lines + endText + lineNumText;
 
@@ -172,7 +182,7 @@ namespace auto_concept {
                     auto FixIt = FixItHint::CreateInsertion(endLoc, finalText);
 
                     auto& diag = firstContext->getDiagnostics();
-                    const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Writing AutoConcept probe");
+                    const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Writing AutoConcept specialization probes");
                     {
                         const auto& builder = diag.Report(endLoc, diagID);
                         builder.AddFixItHint(FixIt);
@@ -182,6 +192,36 @@ namespace auto_concept {
 
                 }
             }
+        }
+    }
+
+
+    void CollectProbes(const std::unordered_map< int64_t, clang::SmallVector<clang::ast_matchers::MatchFinder::MatchResult> >& matches, GuesserCollection::InnerType guessers) {
+        for (auto& matchesPair : matches) {
+            auto firstMatch = *matchesPair.second.begin();
+            ASTContext* firstContext = firstMatch.Context;
+
+            if (auto* funcTemp = const_cast<clang::FunctionTemplateDecl*>(firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl2"))) {
+                if (funcTemp->getTemplateParameters()) {
+                    Guesser guesser;
+                    for (auto spec : funcTemp->specializations()) {
+                        auto specParams = spec->getTemplateSpecializationArgs();
+                        Guesser::SpecTypes specParamObj;
+                        for (const auto& param : specParams->asArray()) {
+                            auto fullType = param.getAsType().getCanonicalType().getAsString();
+                            specParamObj.types.push_back(fullType);
+                        }
+                        specParamObj.good = !spec->isInvalidDecl();
+                        guesser.templateSpecs.insert(specParamObj);
+                    }
+
+                    auto fullName = funcTemp->getCanonicalDecl()->getQualifiedNameAsString();
+                    auto& guesserMap = *guessers.get();
+                    guesserMap[fullName] = guesser;
+                }
+            }
+
+
         }
     }
 }

@@ -72,9 +72,42 @@ namespace auto_concept {
         llvm::cl::opt<std::string> CLOptions::RewriteSuffixOption("rewrite-suffix",
             llvm::cl::desc("If -rewrite is set, changes will be rewritten to a file with the same name, but this suffix"),
             llvm::cl::cat(MyToolCategory));
-       /* llvm::cl::opt<int> CLOptions::ThresholdOption("threshold",
-            llvm::cl::desc("The threshold"),
+
+        llvm::cl::opt<bool> CLOptions::GenerateResourcesOption("generate-resources",
+            llvm::cl::init(false),
+            llvm::cl::desc("If set, the program will generate new resources files, call this whenever Types.txt or Concepts.txt was changed"),
+            llvm::cl::cat(MyToolCategory));
+
+        llvm::cl::opt<int> CLOptions::LogLevelOption("log-level",
+            llvm::cl::init(0),
+            llvm::cl::desc("Logging level from 0 to 3, the lower the value the less details the program gives. ( 3 reports injected errors )"),
+            llvm::cl::cat(MyToolCategory));
+
+        llvm::cl::opt<bool> CLOptions::KeepTempFilesOption("keep-temp-files",
+            llvm::cl::init(false),
+            llvm::cl::desc("If set, the program won't delete the generated temp files"),
+            llvm::cl::cat(MyToolCategory));
+
+        llvm::cl::list<std::string> CLOptions::TestConceptOption("test-concept",
+            llvm::cl::NumOccurrencesFlag(llvm::cl::ZeroOrMore),
+            llvm::cl::desc("Print why the given concept wasn't considered"),
+            llvm::cl::cat(MyToolCategory));
+        llvm::cl::list<std::string> CLOptions::IgnoreTypeOption("ignore-type",
+            llvm::cl::NumOccurrencesFlag(llvm::cl::ZeroOrMore),
+            llvm::cl::desc("Ignores the following type when choosing concepts"),
+            llvm::cl::cat(MyToolCategory));
+        /*llvm::cl::opt<int> CLOptions::MinPreventOption("min-prevent",
+            llvm::cl::init(0),
+            llvm::cl::desc("Min number of specialization types the genereted concept should disallow"),
             llvm::cl::cat(MyToolCategory));*/
+        llvm::cl::opt<int> CLOptions::MaxPreventOption("max-prevent",
+            llvm::cl::init(0),
+            llvm::cl::desc("Max number of semantically correct specializations the genereted concept is allowed to prevent"),
+            llvm::cl::cat(MyToolCategory));
+        llvm::cl::opt<int> CLOptions::MaxAllowOption("max-allow",
+            llvm::cl::init(0),
+            llvm::cl::desc("Max number of semantically incorrect specializations the genereted concept could allow"),
+            llvm::cl::cat(MyToolCategory));
 
         llvm::cl::alias CLOptions::RewriteSuffixOptionAlias("x",
             llvm::cl::desc("Alias for rewrite-suffix option"),
@@ -95,15 +128,15 @@ namespace auto_concept {
         std::string FixItRewriterOptions::RewriteFilename(const std::string& Filename, int& fd) {
             fd = -1;
 
-            llvm::errs() << "Rewriting FixIts ";
+            if (CLOptions::LogLevelOption > 0) llvm::errs() << "Rewriting FixIts ";
 
             if (RewriteSuffix.empty()) {
-                llvm::errs() << "in-place\n";
+                if (CLOptions::LogLevelOption > 0) llvm::errs() << "in-place\n";
                 return Filename;
             }
 
             const auto NewFilename = Filename.substr(0, Filename.find_last_of('.') + 1) + RewriteSuffix + Filename.substr(Filename.find_last_of('.'));
-            llvm::errs() << "from " << Filename << " to " << NewFilename << "\n";
+            if (CLOptions::LogLevelOption > 0) llvm::errs() << "from " << Filename << " to " << NewFilename << "\n";
 
             return NewFilename;
         }

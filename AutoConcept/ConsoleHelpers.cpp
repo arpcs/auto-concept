@@ -14,6 +14,7 @@ namespace auto_concept {
 		llvm::outs() << "Starting job: " << progressName << "\n";
 	}
 	void ProgressBar::End() {
+		if (!started) return;
 		for (int i = currentSteps; i < numberOfSteps - 1; i++) Tick();
 		started = false;
 		currentSteps = numberOfSteps;
@@ -34,7 +35,7 @@ namespace auto_concept {
 			}
 			lastProgress += percentageSkip;
 		}
-		if (numberOfSteps <= currentSteps) End();
+		//if (numberOfSteps <= currentSteps) End();
 	}
 
 }

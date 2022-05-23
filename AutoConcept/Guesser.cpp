@@ -7,13 +7,13 @@
 #include "llvm/ADT/SmallVector.h"
 
 #include "Guesser.h"
+#include "CommandLine.h"
 
 namespace auto_concept {
 
 	using namespace std;
 
-	vector<optional<SpecializedConcept>> Guesser::GetFittingConcepts() {
-
+	vector<optional<SpecializedConcept>> Guesser::GetFittingConcepts(shared_ptr<Resources> resources) {
 		if (!Santalyzer()) return {};
 
 		const int tParams = templateSpecs.begin()->types.size();
@@ -33,26 +33,47 @@ namespace auto_concept {
 
 			for (size_t i = 0; i < resources->concepts.size(); i++) {
 
-				// Check if concepts says false when the specialization fails
-				// And if the concepts says true when the specialization passes
-				bool goodFit = true;
+				
+				// Check for concept-type fitting
+				int allowedRemaining = CLOptions::MaxAllowOption;
+				int preventedRemaining = CLOptions::MaxPreventOption;
 				for (const auto& specType : specTypeMap) {
 					if (!typesInResources.contains(specType.second.typeName)) continue;
+
+					// Check if concepts says false when the specialization fails
 					if (specType.second.validity == Validity::bad) {
 						if (resources->concepts[i].passingTypes.contains(specType.second.typeName)) {
-							goodFit = false;
-							break;
+							if (!CLOptions::contains(CLOptions::IgnoreTypeOption, specType.second.typeName)) {
+								allowedRemaining--;
+								if (CLOptions::contains(CLOptions::TestConceptOption, resources->concepts[i].name)) {
+									if (allowedRemaining > -5)
+										llvm::outs() << "[Test concept] * Concept '" + resources->concepts[i].name + "' allowed semantically incorrect specialization for template param index: " + to_string(tParamIndex) + "\tand type: " + specType.second.typeName + "\n";
+								}
+								else if (allowedRemaining < 0) break;
+							}
 						}
 					}
+
+					// Check if the concepts says true when the specialization passes
 					if (specType.second.validity == Validity::good) {
 						if (!resources->concepts[i].passingTypes.contains(specType.second.typeName)) {
-							goodFit = false;
-							break;
+							if (!CLOptions::contains(CLOptions::IgnoreTypeOption, specType.second.typeName)) {
+								preventedRemaining--;
+								if (CLOptions::contains(CLOptions::TestConceptOption, resources->concepts[i].name)) {
+									if (preventedRemaining > -5)
+										llvm::outs() << "[Test concept] * Concept '" + resources->concepts[i].name + "' prevented semantically correct specialization for template param index: " + to_string(tParamIndex) + "\tand type: " + specType.second.typeName + "\n";
+								}
+								else if (preventedRemaining < 0) break;
+							}
 						}
 					}
 				}
+				if (allowedRemaining <= -5) llvm::outs() << "[Test concept] * Concept '" + resources->concepts[i].name + "' allowed " + to_string(-allowedRemaining - 5) + " more semantically incorrect specialization for template param index: " + to_string(tParamIndex) + "\n";
+				if (preventedRemaining <= -5) llvm::outs() << "[Test concept] * Concept '" + resources->concepts[i].name + "' prevented " + to_string(-allowedRemaining - 5) + " more semantically correct specialization for template param index: " + to_string(tParamIndex) + "\n";
 
-				if (goodFit) {
+				if (allowedRemaining>=0 && preventedRemaining>=0) {
+					if (CLOptions::contains(CLOptions::TestConceptOption, resources->concepts[i].name)) llvm::outs() << "[Test concept] * Concept '" + resources->concepts[i].name + "' is a good fit for template param index: " + to_string(tParamIndex)
+						+"\tand have this many allowed types: "+to_string(resources->concepts[i].passingTypes.size())+" \n";
 					if (minNumberOfPassingTypes > resources->concepts[i].passingTypes.size()) {
 						minNumberOfPassingTypes = resources->concepts[i].passingTypes.size();
 						conceptWhere = i;

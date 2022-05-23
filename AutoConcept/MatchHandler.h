@@ -48,6 +48,7 @@
 #include "CommandLine.h"
 #include "ResourceTypes.h"
 #include "AutoConcept.h"
+#include "Guesser.h"
 
 namespace auto_concept {
     class Consumer;
@@ -62,6 +63,7 @@ namespace auto_concept {
         std::function<void(const MatchFinder::MatchResult&)> customMatchHandler;
         std::shared_ptr<Resources> resources;
         AutoConceptTuState tuState;
+        GuesserCollection::InnerType guessers;
 
         friend Consumer;
         /// Allocates a \c FixItRewriter and sets it as the client of the given \p DiagnosticsEngine.
@@ -73,8 +75,10 @@ namespace auto_concept {
             std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher,
             std::function<void(const MatchFinder::MatchResult&)> customMatchHandler,
             std::shared_ptr<Resources> resources,
-            AutoConceptTuState tuState)
-            : FixItOptions(RewriteSuffix), DoRewrite(DoRewrite), customMatcher(customMatcher), customMatchHandler(customMatchHandler), resources{ resources }, tuState{ tuState } {}
+            AutoConceptTuState tuState,
+            GuesserCollection::InnerType guessers)
+            : FixItOptions(RewriteSuffix), DoRewrite(DoRewrite), customMatcher(customMatcher), customMatchHandler(customMatchHandler),
+            resources{ resources }, tuState{ tuState }, guessers{ guessers } {}
 
         virtual void run(const clang::ast_matchers::MatchFinder::MatchResult& Result) final;
         virtual void onStartOfTranslationUnit() final;

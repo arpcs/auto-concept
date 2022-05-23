@@ -53,6 +53,7 @@
 #include "FrontendAction.h"
 #include "ResourceTypes.h"
 #include "BasicResourceGenerators.h"
+#include "Guesser.h"
 
 
 namespace auto_concept {
@@ -66,32 +67,20 @@ namespace auto_concept {
 
     int RunApp(int argc, const char** argv) {
 
-       /* FILE* asdf, * asdf2;
-       // auto pastErr = stderr;
-        //auto pastOut = stdout;
-        fflush(stdout);
-        fflush(stderr);
-        auto err1 = freopen_s(&asdf, "myfile.txt", "w", stdout);
-        auto err2 = freopen_s(&asdf2, "myfile2.txt", "w", stderr);*/
-
-       /* fclose(asdf);
-        fclose(asdf2);
-        freopen_s(&asdf, "CONOUT$", "w", stdout);
-        freopen_s(&asdf2, "CONOUT$", "w", stderr);
-        fflush(stdout);
-        fflush(stderr);*/
+        auto resources = std::make_shared<Resources>();
+        GuesserCollection guesserCollection;
 
         auto ExpectedParser = CommonOptionsParser::create(argc, argv, CLOptions::MyToolCategory);
         if (!ExpectedParser) {
+            if (CLOptions::GenerateResourcesOption) {
+                FillMissingResources(*resources.get());
+                return 0;
+            }
             // Fail gracefully for unsupported options.
             llvm::WithColor color(llvm::errs(), raw_ostream::Colors::RED);
             llvm::errs() << ExpectedParser.takeError();
             return 1;
         }
-
- 
-
-        auto resources = std::make_shared<Resources>();
 
         CommonOptionsParser& OptionsParser = ExpectedParser.get();
         ClangTool    Tool(OptionsParser.getCompilations(),
@@ -100,12 +89,12 @@ namespace auto_concept {
             llvm::vfs::getRealFileSystem()
         );
 
-        auto factory = std::make_unique<ToolFactory>();
+        auto factory = std::make_unique<ToolFactory>(guesserCollection);
         factory.get()->resources = resources;
         return Tool.run(factory.get());
     }
 
-    int RunAppOnVirtual(std::string& virtualFile, 
+    int RunAppOnVirtual(std::string& virtualFile, const std::vector<std::string>& args,
         std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher,
         std::function<void(const MatchFinder::MatchResult&)>     customMatchHandler) {
 
@@ -124,9 +113,7 @@ namespace auto_concept {
         fflush(stderr);*/
 
         auto resources = std::make_shared<Resources>();
-        if (!customMatcher && !customMatchHandler) {
-            //FillMissingResources(res);
-        }
+        GuesserCollection guesserCollection;
        // llvm::raw_null_ostream throwArayStdOut{};
         //auto savedStdOut = &outs();
         for (int pass = 0; pass < 2; pass++) {
@@ -135,17 +122,23 @@ namespace auto_concept {
             //else outs().tie(savedStdOut);
 
             // Prepare for testing
-            const std::string virtualFileIn = "VirtualInFile.cpp";
-            const std::string virtualFileIn2 = "VirtualInFile2.cpp";
+            std::string virtualFileIn = "VirtualInFile";
             const std::string virtualSuffix = "VirtualOut";
-            const std::string virtualFileOut = virtualFileIn + virtualSuffix;
+            const std::string virtualFileOut = virtualFileIn+ "." + virtualSuffix + ".cpp";
+            virtualFileIn += ".cpp";
             const std::string suffixRewriteArg = "-rewrite-suffix=" + virtualSuffix;
             const std::string injectionSuffix = "AutoConceptTempFile";
             std::vector<const char*> arguments = { "AutoConceptTest", virtualFileIn.c_str()/*,virtualFileIn2.c_str()*/,"-rewrite",suffixRewriteArg.c_str(),"--extra-arg-before=-std=c++2b","--extra-arg=-ferror-limit=0"};
+            //arguments.push_back("-test-concept=random_access_range");
+            //arguments.push_back("-test-concept=integral");
+            
+            for(const auto& arg: args) arguments.push_back(arg.c_str());
+
+            arguments.push_back("--");
             std::vector<std::string> injectedArgs;
             //const char* argv[] = { "AutoConceptTest", virtualFileIn.c_str(),virtualFileIn2.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--extra-arg-before=-std=c++2b","--extra-arg=-Xclang","--extra-arg=-fcolor-diagnostics","--"};
             int argc = arguments.size();
-            if (pass == 0) {
+            if (pass == 0 && !customMatcher && !customMatchHandler) {
                 auto ExpectedParser = CommonOptionsParser::create(argc, arguments.data(), CLOptions::MyToolCategory);
                 if (ExpectedParser && !CLOptions::SkipProbingOption) {
                     for (const auto& filename: ExpectedParser->getSourcePathList())
@@ -174,10 +167,21 @@ namespace auto_concept {
                 llvm::errs() << ExpectedParser.takeError();
                 return 1;
             }
+
+
+            for (const auto& filename : ExpectedParser->getSourcePathList())
+            {
+                const std::string newFilename = filename.substr(0, filename.find_last_of('.') + 1) + injectionSuffix + filename.substr(filename.find_last_of('.'));
+                if (pass == 1 && std::filesystem::exists(newFilename) && !CLOptions::KeepTempFilesOption)
+                    std::filesystem::remove(newFilename);
+                if (pass == 0 && std::filesystem::exists(newFilename))
+                    std::filesystem::remove(newFilename);
+                argc++;
+            }
+
+
+
             CommonOptionsParser& OptionsParser = ExpectedParser.get();
-
-            
-
             ClangTool    Tool(OptionsParser.getCompilations(),
                 OptionsParser.getSourcePathList(),
                 std::make_shared<PCHContainerOperations>(),
@@ -189,9 +193,8 @@ namespace auto_concept {
 
             // Map the string reference to a virtual file when testing
             Tool.mapVirtualFile(virtualFileIn, virtualFile);
-            Tool.mapVirtualFile(virtualFileIn2, virtualFile);
 
-            auto factory = std::make_unique<ToolFactory>();
+            auto factory = std::make_unique<ToolFactory>(guesserCollection);
             factory.get()->customMatcher = customMatcher;
             factory.get()->customMatchHandler = customMatchHandler;
             factory.get()->resources = resources;
@@ -201,13 +204,13 @@ namespace auto_concept {
             
             auto result = Tool.run(factory.get());
 
-            if (pass == 1) {
+            if (pass == 1 || CLOptions::SkipProbingOption || customMatcher || customMatchHandler) {
                 if (auto FixedVirtualFile = Tool.getFiles().getVirtualFileSystem().openFileForRead(virtualFileOut)) {
                     if (auto FixedVirtualFileBuffer = FixedVirtualFile.get().get()->getBuffer(virtualFileOut)) {
                         virtualFile = FixedVirtualFileBuffer.get().get()->getBuffer().str();
                     }
                 }
-
+                if (!CLOptions::KeepTempFilesOption && std::filesystem::exists(virtualFileOut)) std::filesystem::remove(virtualFileOut);
                 return result;
             }
         }

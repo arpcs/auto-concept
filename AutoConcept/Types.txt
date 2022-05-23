@@ -29,16 +29,14 @@ class std::unordered_set<int>	unordered_set	TRUE
 class std::unordered_multiset<int>	unordered_set	TRUE
 class std::unordered_map<int,int>	unordered_map	TRUE
 class std::unordered_multimap<int,int>	unordered_map	TRUE
-class std::array<bool,8>	array	TRUE
-class std::vector<bool>	vector	TRUE
-class std::deque<bool>	deque	TRUE
-class std::list<bool>	list	TRUE
-class std::forward_list<bool>	forward_list	TRUE
-class std::set<bool>	set	TRUE
-class std::multiset<bool>	set	TRUE
-class std::map<bool,bool>	map	TRUE
-class std::multimap<bool,bool>	map	TRUE
-class std::unordered_set<bool>	unordered_set	TRUE
-class std::unordered_multiset<bool>	unordered_set	TRUE
-class std::unordered_map<bool,bool>	unordered_map	TRUE
-class std::unordered_multimap<bool,bool>	unordered_map	TRUE
+class std::unique_ptr<int>	memory	TRUE
+class std::shared_ptr<int>	memory	TRUE
+class std::any	any	TRUE
+class std::bitset<4>	bitset	TRUE
+class std::chrono::duration<int>	chrono	TRUE
+class std::function<void(int)>	functional	TRUE
+class std::initializer_list<int>	initializer_list	TRUE
+class std::optional<int>	optional	TRUE
+class std::variant<int, float>	variant	TRUE
+class std::basic_string_view<char>	string_view	TRUE
+class std::span<int>	span	TRUE
