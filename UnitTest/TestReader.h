@@ -13,8 +13,10 @@
 
 namespace auto_concept_test {
 
+	// Virtual file runner
 	std::string runner(std::string input, const std::vector<std::string>& args);
 
+	// Class to read test source dynamically
 	class TestReader {
 	public:
 		struct Test {

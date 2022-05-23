@@ -4,7 +4,6 @@
 
 #include "TestReader.h"
 #include "../AutoConcept/AutoConcept.h"
-
 #include "gtest/gtest.h"
 
 namespace auto_concept_test {

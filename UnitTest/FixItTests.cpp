@@ -1,3 +1,6 @@
+// [Comment]	This is a dynamically read test file
+// [Comment]	It's possible to use it from the unit test framework
+// [Comment]	As well as from the AutoConcept console app directly
 // [Setup]
 #define CONCAT_INDIRECT(x, y) x ## y
 #define CONCAT(x, y) CONCAT_INDIRECT(x, y)

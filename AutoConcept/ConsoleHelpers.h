@@ -9,6 +9,7 @@
 
 namespace auto_concept {
 
+	// A RAII object to track long proccesses and give feedback to user
 	class ProgressBar {
 		bool started = false;
 		int lastProgress = 0;
