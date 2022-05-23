@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "TestReader.h"
 
 #include "gtest/gtest.h"
 #include <iostream>
@@ -8,11 +8,7 @@ namespace auto_concept_test {
 	using namespace std;
 
 	TEST(TestCaseName, TestName) {
-
-
-		//EXPECT_EQ(runner("template<typename T> void f(T t) {return t;}"), "template<typename T> void f(T t) {return t;}");
-
-		TestReader reader("RewriteTestsDeduced.cpp");
+		TestReader reader("FixItTests.cpp");
 
 		int counter = 0;
 		for (auto& testCase : reader)
