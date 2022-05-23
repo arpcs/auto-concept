@@ -105,10 +105,7 @@ namespace auto_concept {
             }
         }
 
-        if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl rewrite")) 
-            matches[func->getID()].push_back(Result);
-
-        if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl2"))
+        if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("Trivial FunctionTemplateDecl"))
             matches[func->getID()].push_back(Result);
     }
 
@@ -132,41 +129,8 @@ namespace auto_concept {
         for (auto& matchesPair : matches) {
             auto firstMatch = *matchesPair.second.begin();
             ASTContext* firstContext = firstMatch.Context;
-
-            if (const auto* func = firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl rewrite")) {
-                const auto& funcDecl = func->getTemplatedDecl();
-
-                FullSourceLoc FullLocation = firstContext->getFullLoc(funcDecl->getBeginLoc());
-                FullLocation.getColumnNumber();
-                SourceLocation s = funcDecl->getBeginLoc();
-
-                string replaceText = "requires ";
-                string noteText = "";
-                int i = 0;
-                for (auto & match : matchesPair.second) {
-                    if (const auto* param = match.Nodes.getNodeAs<clang::TemplateTypeParmDecl>("templateTypeParmDecl arithmetic")) {
-                        const std::string& paramName = param->getName().str();
-                        if (i++ != 0) replaceText += "&& ";
-                        if (i != 0) noteText += " ";
-                        replaceText += "std::is_arithmetic_v<" + paramName + "> ";
-                        noteText += "(arithmetic)'" + paramName + "'";
-                    }
-                }
-                
-                // ToDo: \t....
-                auto FixIt = FixItHint::CreateInsertion(funcDecl->getBeginLoc(), replaceText + "\n\t");
-                auto& diag = firstContext->getDiagnostics();
-                const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Consider adding concepts to template(s): %0");
-                // So we destroy our builder to execute it..
-                {
-                    const auto& builder = diag.Report(func->getBeginLoc(), diagID);
-                    builder.AddString(noteText);
-                    builder.AddFixItHint(FixIt);
-                }
-                
-            }
-            
-            if (auto* funcTemp = const_cast<clang::FunctionTemplateDecl*>(firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl2"))) {
+     
+            if (auto* funcTemp = const_cast<clang::FunctionTemplateDecl*>(firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("Trivial FunctionTemplateDecl"))) {
 
                 Guesser guesser;
                 auto fullName = funcTemp->getCanonicalDecl()->getQualifiedNameAsString();

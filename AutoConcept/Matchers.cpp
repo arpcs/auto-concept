@@ -25,10 +25,7 @@ namespace auto_concept {
                     )
                 ),
                 isExpansionInMainFile()
-                ,
-                forEach(templateTypeParmDecl(
-                ).bind("asdf"))
-            ).bind("functionTemplateDecl2")
+            ).bind("Trivial FunctionTemplateDecl")
         );
 
 

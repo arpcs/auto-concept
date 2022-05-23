@@ -97,7 +97,7 @@ namespace auto_concept {
             auto firstMatch = *matchesPair.second.begin();
             ASTContext* firstContext = firstMatch.Context;
 
-            if (auto* funcTemp = const_cast<clang::FunctionTemplateDecl*>(firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl2"))) {
+            if (auto* funcTemp = const_cast<clang::FunctionTemplateDecl*>(firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("Trivial FunctionTemplateDecl"))) {
                 if (funcTemp->getTemplateParameters() != nullptr) {
                     auto tParams = funcTemp->getTemplateParameters();
                     const unsigned int minRequiredTemplateArguments = tParams->getMinRequiredArguments();
@@ -189,7 +189,7 @@ namespace auto_concept {
             auto firstMatch = *matchesPair.second.begin();
             ASTContext* firstContext = firstMatch.Context;
 
-            if (auto* funcTemp = const_cast<clang::FunctionTemplateDecl*>(firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("functionTemplateDecl2"))) {
+            if (auto* funcTemp = const_cast<clang::FunctionTemplateDecl*>(firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("Trivial FunctionTemplateDecl"))) {
                 if (funcTemp->getTemplateParameters()) {
                     Guesser guesser;
                     for (auto spec : funcTemp->specializations()) {
