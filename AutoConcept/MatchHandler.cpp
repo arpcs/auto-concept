@@ -58,6 +58,7 @@
 #include "clang/Sema/TemplateDeduction.h"
 
 #include "ProbeManager.h"
+#include "CustomFixItRewriter.h"
 
 namespace auto_concept {
     using namespace clang::ast_matchers;
@@ -68,8 +69,11 @@ namespace auto_concept {
 
     MatchHandler::RewriterPointer MatchHandler::createRewriter(clang::DiagnosticsEngine& DiagnosticsEngine,
         clang::ASTContext& Context) {
+        
         auto Rewriter =
-            std::make_unique<clang::FixItRewriter>(DiagnosticsEngine,
+            std::make_unique<CustomFixItRewriter>(
+                tuState == AutoConceptTuState::InjectingProbes,
+                DiagnosticsEngine,
                 Context.getSourceManager(),
                 Context.getLangOpts(),
                 &FixItOptions);
@@ -81,8 +85,6 @@ namespace auto_concept {
         // client gets destroyed, leading to happy segfaults when the rewriter
         // handles a diagnostic.
         DiagnosticsEngine.setClient(Rewriter.get(), /*ShouldOwnClient=*/false);
-
-        
 
         return Rewriter;
     }
@@ -105,6 +107,7 @@ namespace auto_concept {
             }
         }
 
+        // Collect the matcher for later use. It's probably very expensive, but easier to handle for now
         if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("Trivial FunctionTemplateDecl"))
             matches[func->getID()].push_back(Result);
     }
@@ -113,6 +116,7 @@ namespace auto_concept {
         matches.clear();
     }
 
+    // Handle match results after the end of the TU
     void MatchHandler::onEndOfTranslationUnit() {      
 
         RewriterPointer Rewriter = nullptr;
@@ -196,7 +200,7 @@ namespace auto_concept {
             }
             
         }
-        
+      
         if (DoRewrite && Rewriter != nullptr) Rewriter->WriteFixedFiles();
     }
 

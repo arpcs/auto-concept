@@ -103,6 +103,9 @@
     <ClInclude Include="ToolFactory.h">
       <Filter>Core\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CustomFixItRewriter.h">
+      <Filter>Core\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Concepts.txt">

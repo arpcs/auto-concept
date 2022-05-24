@@ -309,6 +309,7 @@
     <ClInclude Include="AutoConcept.h" />
     <ClInclude Include="ConsoleHelpers.h" />
     <ClInclude Include="Consumer.h" />
+    <ClInclude Include="CustomFixItRewriter.h" />
     <ClInclude Include="FrontendAction.h" />
     <ClInclude Include="Guesser.h" />
     <ClInclude Include="Matchers.h" />

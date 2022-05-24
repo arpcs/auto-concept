@@ -58,7 +58,6 @@ namespace auto_concept {
 
         // CommonOptionsParser declares HelpMessage with a description of the common
         // command-line options related to the compilation database and input files.
-        // It's nice to have this help message in all tools.
         extrahelp CLOptions::CommonHelp(CommonOptionsParser::HelpMessage);
 
         // Boolean options
@@ -121,8 +120,9 @@ namespace auto_concept {
         );
 
         // A help message for this specific tool can be added afterwards.
-        extrahelp CLOptions::MoreHelp("\nMore help text...");
+        extrahelp CLOptions::MoreHelp("\n");
 
+        // For a file to be rewritten, returns the possibly new filename.
         std::string FixItRewriterOptions::RewriteFilename(const std::string& Filename, int& fd) {
             fd = -1;
 

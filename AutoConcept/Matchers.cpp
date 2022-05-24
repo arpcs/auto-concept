@@ -10,7 +10,6 @@ namespace auto_concept {
 
     vector<DeclarationMatcher> GetMatchersGuessed() {
 
-        // Don't change matchers
         vector<DeclarationMatcher> matchers;
 
         matchers.push_back(

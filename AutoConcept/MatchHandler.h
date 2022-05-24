@@ -49,13 +49,16 @@
 #include "ResourceTypes.h"
 #include "AutoConcept.h"
 #include "Guesser.h"
+#include "CustomFixItRewriter.h"
 
 namespace auto_concept {
     class Consumer;
+
+    // Class for match handling
     class MatchHandler : public clang::ast_matchers::MatchFinder::MatchCallback {
         using MatchFinder = clang::ast_matchers::MatchFinder;
         using MatchResult = MatchFinder::MatchResult;
-        using RewriterPointer = std::unique_ptr<clang::FixItRewriter>;
+        using RewriterPointer = std::unique_ptr<CustomFixItRewriter>;
         FixItRewriterOptions FixItOptions;
         std::unordered_map< int64_t, clang::SmallVector<MatchResult> > matches;
         bool DoRewrite;

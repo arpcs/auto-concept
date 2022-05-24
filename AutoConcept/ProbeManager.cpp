@@ -85,11 +85,10 @@ namespace auto_concept {
                 includeTxt += "#include<" + include + ">\n";
             }
             auto FixItInclude = FixItHint::CreateInsertion(fileEndPos, includeTxt);
-            const auto diagIDInclude = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Writing AutoConcept include probes");
+            const auto diagIDInclude = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "[AutoConcept] Setting up probes");
             {
-                const auto& builder = diag.Report(fileEndPos, diagIDInclude);
+                const auto& builder = diag.Report(diagIDInclude);
                 builder.AddFixItHint(FixItInclude);
-                builder.setForceEmit();
             }
         }
 
@@ -170,9 +169,9 @@ namespace auto_concept {
                     auto FixIt = FixItHint::CreateInsertion(endLoc, finalText);
 
                     auto& diag = firstContext->getDiagnostics();
-                    const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "Writing AutoConcept specialization probes");
+                    const auto diagID = diag.getCustomDiagID(clang::DiagnosticsEngine::Remark, "[AutoConcept] Probing templates");
                     {
-                        const auto& builder = diag.Report(endLoc, diagID);
+                        const auto& builder = diag.Report(diagID);
                         builder.AddFixItHint(FixIt);
                     }
 

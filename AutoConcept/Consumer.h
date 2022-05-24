@@ -48,6 +48,8 @@
 
 
 namespace auto_concept {
+
+    // AST matcher consumer
     class Consumer : public clang::ASTConsumer {
         /// Our callback for matches.
         MatchHandler handler;

@@ -6,10 +6,11 @@
 #include <LLVM/Support/raw_ostream.h>
 
 #include <string>
+#include <vector>
 
 namespace auto_concept {
 
-	// A RAII object to track long proccesses and give feedback to user
+	// An RAII object to track long proccesses and give feedback to user
 	class ProgressBar {
 		bool started = false;
 		int lastProgress = 0;
@@ -31,5 +32,8 @@ namespace auto_concept {
 		const int numberOfSteps;
 		int currentSteps;
 	};
+
+
+	std::vector<std::string> GetWithProbeFiles(const std::vector<std::string>& files, const std::string suffix, std::vector<std::string>& injected);
 
 }

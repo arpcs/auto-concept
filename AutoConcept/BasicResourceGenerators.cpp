@@ -40,7 +40,7 @@ namespace auto_concept {
         }
         for (auto& conceptRow : resources.concepts) conceptRow.found = false;
 
-        RunAppOnVirtual(input, {},
+        RunApp(input, {},
             [&]() { return decl().bind("decl"); },
             [&](const MatchFinder::MatchResult& result) {
                 if (const auto* conceptDec = result.Nodes.getNodeAs<clang::ConceptDecl>("decl")) {
@@ -59,7 +59,7 @@ namespace auto_concept {
 
         ProgressBar templateProgressBar("Filling basic template predictate parameters",
             std::count_if(resources.concepts.begin(), resources.concepts.end(), [](Concept& r) { return !r.isConcept; }));
-        RunAppOnVirtual(input, {},
+        RunApp(input, {},
             [&]() { return decl( has(templateTypeParmDecl()), has(varDecl(isConstexpr(), hasType(booleanType())))).bind("varTempDec"); },
             [&](const MatchFinder::MatchResult& result) {
                 if (const auto* conceptDec = result.Nodes.getNodeAs<clang::VarTemplateDecl>("varTempDec")) {
@@ -133,7 +133,7 @@ namespace auto_concept {
         for (auto& conceptIncludeRow : includesMap) conceptIncludes+="\n#include <"+ conceptIncludeRow.first+">";
 
         string finalConceptInput = conceptIncludes + "\n void foo(){\n" + conceptTesters+"\n }";
-        RunAppOnVirtual(finalConceptInput, {},
+        RunApp(finalConceptInput, {},
             [&]() { return varDecl(isConstexpr(), isExpansionInMainFile()).bind("VarDecl"); },
             [&](const MatchFinder::MatchResult& result) {
                 if (const auto* conceptDec = result.Nodes.getNodeAs<clang::VarDecl>("VarDecl")) {

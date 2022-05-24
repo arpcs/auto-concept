@@ -37,4 +37,22 @@ namespace auto_concept {
 		}
 	}
 
+
+	std::vector<std::string> GetWithProbeFiles(const std::vector<std::string>& files, const std::string suffix, std::vector<std::string>& injected) {
+		std::vector<std::string> changedArgs = files;
+		for (const auto& filename : files)
+		{
+			const std::string newFilename = filename.substr(0, filename.find_last_of('.') + 1) + suffix + filename.substr(filename.find_last_of('.'));
+			for (auto it = changedArgs.begin(); it != changedArgs.end(); it++) {
+				if (std::string(*it) == filename) {
+					changedArgs.insert(it + 1, newFilename);
+					injected.push_back(newFilename);
+					break;
+				}
+			}
+
+		}
+
+		return changedArgs;
+	}
 }

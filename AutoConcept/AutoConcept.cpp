@@ -1,14 +1,11 @@
+
+// Clang includes
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Tooling.h"
 #include "clang/Basic/SourceLocation.h"
-
-#include "llvm/Support/CommandLine.h"
-
-
-// Clang includes
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/Expr.h"
@@ -33,6 +30,7 @@
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/WithColor.h"
+#include "llvm/Support/CommandLine.h"
 
 // Standard includes
 #include <cassert>
@@ -45,6 +43,7 @@
 #include <functional>
 #include <vector>
 
+// Own includes
 #include "AutoConcept.h"
 #include "Matchers.h"
 #include "MatchHandler.h"
@@ -55,6 +54,7 @@
 #include "BasicResourceGenerators.h"
 #include "Guesser.h"
 #include "ToolFactory.h"
+#include "ConsoleHelpers.h"
 
 
 namespace auto_concept {
@@ -64,134 +64,145 @@ namespace auto_concept {
     using namespace clang;
     using namespace llvm;
     using namespace llvm::cl;
+    using namespace std;
 
-
+    // Running app on console arguments
     int RunApp(int argc, const char** argv) {
 
-        auto resources = std::make_shared<Resources>();
-        GuesserCollection guesserCollection;
+        // Collect argv to a vector
+        vector<string> args;
+        for (size_t i = 0; i < argc; i++) args.push_back(argv[i]);
+        string empty;
 
-        auto ExpectedParser = CommonOptionsParser::create(argc, argv, CLOptions::MyToolCategory);
-        if (!ExpectedParser) {
-            if (CLOptions::GenerateResourcesOption) {
-                FillMissingResources(*resources.get());
-                return 0;
-            }
-            // Fail gracefully for unsupported options.
-            llvm::WithColor color(llvm::errs(), raw_ostream::Colors::RED);
-            llvm::errs() << ExpectedParser.takeError();
-            return 1;
-        }
-
-        CommonOptionsParser& OptionsParser = ExpectedParser.get();
-        ClangTool    Tool(OptionsParser.getCompilations(),
-            OptionsParser.getSourcePathList(),
-            std::make_shared<PCHContainerOperations>(),
-            llvm::vfs::getRealFileSystem()
-        );
-
-        auto factory = std::make_unique<ToolFactory>(guesserCollection);
-        factory.get()->resources = resources;
-        return Tool.run(factory.get());
+        // Run the general case
+        return RunApp(empty, args);
     }
 
-    int RunAppOnVirtual(std::string& virtualFile, const std::vector<std::string>& args,
+    // Running app on general inputs
+    int RunApp(std::string& virtualFile, 
+        const std::vector<std::string> args,
         std::function<clang::ast_matchers::DeclarationMatcher()> customMatcher,
         std::function<void(const MatchFinder::MatchResult&)>     customMatchHandler) {
 
+        // Do we run on a source compiled from a string?
+        bool virtualRun = virtualFile != "";
+
+        // Initializing basic resources for calculating concepts
         auto resources = std::make_shared<Resources>();
         GuesserCollection guesserCollection;
+
+        // List of injected files to delete later
+        vector<string> injectedTempFiles;
+
+        // Program return value
+        int success = 0;
+
+        // We usually need 2 passes on the input files
         for (int pass = 0; pass < 2; pass++) {
 
-            // Prepare for testing
-            std::string virtualFileIn = "VirtualInFile";
-            const std::string virtualSuffix = "VirtualOut";
-            const std::string virtualFileOut = virtualFileIn+ "." + virtualSuffix + ".cpp";
-            virtualFileIn += ".cpp";
-            const std::string suffixRewriteArg = "-rewrite-suffix=" + virtualSuffix;
-            const std::string injectionSuffix = "AutoConceptTempFile";
-            std::vector<const char*> arguments = { "AutoConceptTest", virtualFileIn.c_str(),"-rewrite",suffixRewriteArg.c_str(),"--extra-arg-before=-std=c++2b","--extra-arg=-ferror-limit=0"};
+            // Injecting extra arguments needed to us
+            vector<string> argsCopy = args;
+            argsCopy.push_back("--extra-arg-before=-std=c++2b");
+            argsCopy.push_back("--extra-arg=-ferror-limit=0");
+            if (virtualRun) {
+                argsCopy.insert(argsCopy.begin(), "AutoConceptTest");
+                argsCopy.push_back(Constants::virtualFileIn);
 
-            for(const auto& arg: args) arguments.push_back(arg.c_str());
-
-            arguments.push_back("--");
-            std::vector<std::string> injectedArgs;
-            int argc = arguments.size();
-            if (pass == 0 && !customMatcher && !customMatchHandler) {
-                auto ExpectedParser = CommonOptionsParser::create(argc, arguments.data(), CLOptions::MyToolCategory);
-                if (ExpectedParser && !CLOptions::SkipProbingOption) {
-                    for (const auto& filename: ExpectedParser->getSourcePathList())
-                    {
-                        const std::string newFilename = filename.substr(0, filename.find_last_of('.') + 1) + injectionSuffix + filename.substr(filename.find_last_of('.'));
-                        injectedArgs.push_back(newFilename);
-                        for (auto it = arguments.begin(); it != arguments.end(); it++) {
-                            if (std::string(*it) == filename) {
-                                arguments.insert(it+1, injectedArgs.back().c_str());
-                                break;
-                            }
-                        }
-                        argc++;
-                    }  
-                }
+                // This will make the parser stop complaining about the missing compilation database
+                argsCopy.push_back("--");
             }
+            std::vector<const char*> finalArguments;
+            for(const auto& arg: argsCopy) finalArguments.push_back(arg.c_str());
 
-            if (std::filesystem::exists(virtualFileOut)) std::filesystem::remove(virtualFileOut);
+            // Parse the given arguments
+            int argc = finalArguments.size();
+            auto ExpectedParser = CommonOptionsParser::create(argc, finalArguments.data(), CLOptions::MyToolCategory);
+
             
-            argc = arguments.size();
-            auto ExpectedParser = CommonOptionsParser::create(argc, arguments.data(), CLOptions::MyToolCategory);
-            
+            // Fail if we have unsupported options
             if (!ExpectedParser) {
-                // Fail gracefully for unsupported options.
                 llvm::WithColor color(llvm::errs(), raw_ostream::Colors::RED);
                 llvm::errs() << ExpectedParser.takeError();
                 return 1;
             }
+            CommonOptionsParser& OptionsParser = ExpectedParser.get();
 
-
-            for (const auto& filename : ExpectedParser->getSourcePathList())
-            {
-                const std::string newFilename = filename.substr(0, filename.find_last_of('.') + 1) + injectionSuffix + filename.substr(filename.find_last_of('.'));
-                if (pass == 1 && std::filesystem::exists(newFilename) && !CLOptions::KeepTempFilesOption)
-                    std::filesystem::remove(newFilename);
-                if (pass == 0 && std::filesystem::exists(newFilename))
-                    std::filesystem::remove(newFilename);
-                argc++;
+            // Change rewriting command line options when we have a virtual input
+            if (virtualRun) {
+                CLOptions::RewriteOption.setValue(true);
+                CLOptions::RewriteSuffixOption.setValue(Constants::virtualSuffix);
             }
 
+            // Getting source files
+            vector<string> sourcePathList = OptionsParser.getSourcePathList();
 
-            CommonOptionsParser& OptionsParser = ExpectedParser.get();
+            // Getting probe injected source files
+            if (!CLOptions::SkipProbingOption && pass==0)  sourcePathList = GetWithProbeFiles(sourcePathList, Constants::injectionSuffix, injectedTempFiles);
+
+
+            // Creating the Clang Tool
             ClangTool    Tool(OptionsParser.getCompilations(),
-                OptionsParser.getSourcePathList(),
+                sourcePathList,
                 std::make_shared<PCHContainerOperations>(),
                 llvm::vfs::getRealFileSystem()
             );
+            
+            // Map the string reference to a virtual file if needed
+            if (virtualRun) Tool.mapVirtualFile(Constants::virtualFileIn, virtualFile);
 
-
-            // Map the string reference to a virtual file when testing
-            Tool.mapVirtualFile(virtualFileIn, virtualFile);
-
+            // Setting up the Frontend Action Factory
             auto factory = std::make_unique<ToolFactory>(guesserCollection);
             factory.get()->customMatcher = customMatcher;
             factory.get()->customMatchHandler = customMatchHandler;
             factory.get()->resources = resources;
             if (pass == 0 && !CLOptions::SkipProbingOption) factory.get()->globalState = AutoConceptGlobalState::InjectionPass;
             else                                            factory.get()->globalState = AutoConceptGlobalState::FinalPass;
-            factory.get()->injectionProbingSuffix = injectionSuffix;
+            factory.get()->injectionProbingSuffix = Constants::injectionSuffix;
             
-            auto result = Tool.run(factory.get());
+            // Deleting temp files, because the rewriter on suffixed files wont work if the file already exist
+            DeleteTempFiles(0, pass, injectedTempFiles);
 
-            if (pass == 1 || CLOptions::SkipProbingOption || customMatcher || customMatchHandler) {
-                if (auto FixedVirtualFile = Tool.getFiles().getVirtualFileSystem().openFileForRead(virtualFileOut)) {
-                    if (auto FixedVirtualFileBuffer = FixedVirtualFile.get().get()->getBuffer(virtualFileOut)) {
-                        virtualFile = FixedVirtualFileBuffer.get().get()->getBuffer().str();
+
+            // Finally running the tool
+            success |= Tool.run(factory.get());
+
+
+            // Collecting virtual results and early exit
+            if (pass == 1 || CLOptions::SkipProbingOption || customMatcher || customMatchHandler)  {
+                if (virtualRun) {
+                    if (auto FixedVirtualFile = Tool.getFiles().getVirtualFileSystem().openFileForRead(Constants::virtualFileOut)) {
+                        if (auto FixedVirtualFileBuffer = FixedVirtualFile.get().get()->getBuffer(Constants::virtualFileOut)) {
+                            virtualFile = FixedVirtualFileBuffer.get().get()->getBuffer().str();
+                        }
                     }
                 }
-                if (!CLOptions::KeepTempFilesOption && std::filesystem::exists(virtualFileOut)) std::filesystem::remove(virtualFileOut);
-                return result;
+                break;
             }
+
         }
 
-        return -1;
+        // Deleting temp files if the KeepTempFiles option flag wasn't flipped
+        DeleteTempFiles(1, 2, injectedTempFiles);
+
+        return success;
+    }
+
+    // Function for deleting temp files and injected probes
+    void DeleteTempFiles(bool afterTollRun, int pass, const std::vector<std::string>& injectedFiles) {
+
+        // Deleting virtual temp file
+        if (!afterTollRun || !CLOptions::KeepTempFilesOption)
+            if (std::filesystem::exists(Constants::virtualFileOut)) std::filesystem::remove(Constants::virtualFileOut);
+
+        // Deleting probes
+        for (const auto& filename : injectedFiles)
+        {
+            if (!std::filesystem::exists(filename)) continue;
+            if (pass == 0) std::filesystem::remove(filename);
+            if (afterTollRun == true && !CLOptions::KeepTempFilesOption) std::filesystem::remove(filename);
+        }
+
     }
 
 }
+

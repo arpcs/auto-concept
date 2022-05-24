@@ -60,6 +60,7 @@ namespace auto_concept {
     using namespace llvm;
     using namespace std;
 
+    // AST Matcher consumer
     void Consumer::Consume() noexcept {
             Diagnostics Diag;        
             if (this->handler.customMatcher) {
