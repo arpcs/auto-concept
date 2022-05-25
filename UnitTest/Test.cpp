@@ -7,17 +7,26 @@ namespace auto_concept_test {
 
 	using namespace std;
 
-	TEST(TestCaseName, TestName) {
+	TEST(FixItTests, FixItTests) {
 		TestReader reader("FixItTests.cpp");
 
 		int counter = 0;
 		for (auto& testCase : reader)
 		{
 			std::cout << std::endl << "[Starting "<< ++counter << ". Concept Rewrite Test]" << std::endl << std::endl;
+			//EXPECT_EQ(runner(testCase.test, testCase.commandArgs), testCase.expected);
+		}
+	}
+
+	TEST(CommandLineTests, CommandLineTests) {
+		TestReader reader("CommandLineTests.cpp");
+
+		int counter = 0;
+		for (auto& testCase : reader)
+		{
+			std::cout << std::endl << "[Starting " << ++counter << ". Command Line Test]" << std::endl << std::endl;
 			EXPECT_EQ(runner(testCase.test, testCase.commandArgs), testCase.expected);
 		}
-
-		EXPECT_TRUE(true);
 	}
 }
 

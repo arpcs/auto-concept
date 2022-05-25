@@ -6,6 +6,10 @@ char*		TRUE
 short		TRUE
 int		TRUE
 int*		TRUE
+float		TRUE
+float*		TRUE
+double		TRUE
+double*		TRUE
 long long		TRUE
 long long*		TRUE
 unsigned char		TRUE

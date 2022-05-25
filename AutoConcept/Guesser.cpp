@@ -69,11 +69,16 @@ namespace auto_concept {
 					}
 				}
 				if (allowedRemaining <= -5) llvm::outs() << "[Test concept] * Concept '" + resources->concepts[i].name + "' allowed " + to_string(-allowedRemaining - 5) + " more semantically incorrect specialization for template param index: " + to_string(tParamIndex) + "\n";
-				if (preventedRemaining <= -5) llvm::outs() << "[Test concept] * Concept '" + resources->concepts[i].name + "' prevented " + to_string(-allowedRemaining - 5) + " more semantically correct specialization for template param index: " + to_string(tParamIndex) + "\n";
+				if (preventedRemaining <= -5) llvm::outs() << "[Test concept] * Concept '" + resources->concepts[i].name + "' prevented " + to_string(-preventedRemaining - 5) + " more semantically correct specialization for template param index: " + to_string(tParamIndex) + "\n";
 
 				if (allowedRemaining>=0 && preventedRemaining>=0) {
-					if (CLOptions::contains(CLOptions::TestConceptOption, resources->concepts[i].name)) llvm::outs() << "[Test concept] * Concept '" + resources->concepts[i].name + "' is a good fit for template param index: " + to_string(tParamIndex)
-						+"\tand have this many allowed types: "+to_string(resources->concepts[i].passingTypes.size())+" \n";
+
+					// Print stats for concept
+					if (CLOptions::contains(CLOptions::TestConceptOption, resources->concepts[i].name)) llvm::outs() << 
+						"[Test concept] * Concept '" + resources->concepts[i].name + "' is a good fit for template param index: " + to_string(tParamIndex)
+						+"\tand have this many allowed types: "+to_string(resources->concepts[i].passingTypes.size())+"\tprevented: "<< 
+						resources->types.size()- resources->concepts[i].passingTypes.size() <<"\n";
+
 					if (minNumberOfPassingTypes > resources->concepts[i].passingTypes.size()) {
 						minNumberOfPassingTypes = resources->concepts[i].passingTypes.size();
 						conceptWhere = i;

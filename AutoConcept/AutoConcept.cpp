@@ -87,6 +87,9 @@ namespace auto_concept {
         // Do we run on a source compiled from a string?
         bool virtualRun = virtualFile != "";
 
+        // Do we skip probing?
+        bool skipProbing = customMatcher || customMatchHandler;
+
         // Initializing basic resources for calculating concepts
         auto resources = std::make_shared<Resources>();
         GuesserCollection guesserCollection;
@@ -118,6 +121,14 @@ namespace auto_concept {
             int argc = finalArguments.size();
             auto ExpectedParser = CommonOptionsParser::create(argc, finalArguments.data(), CLOptions::MyToolCategory);
 
+            // Update skip probing
+            skipProbing |= CLOptions::SkipProbingOption;
+
+            if (CLOptions::GenerateResourcesOption) {
+                auto resourceVal = *resources.get();
+                FillMissingResources(resourceVal);
+                return 0;
+            }
             
             // Fail if we have unsupported options
             if (!ExpectedParser) {
@@ -137,7 +148,7 @@ namespace auto_concept {
             vector<string> sourcePathList = OptionsParser.getSourcePathList();
 
             // Getting probe injected source files
-            if (!CLOptions::SkipProbingOption && pass==0)  sourcePathList = GetWithProbeFiles(sourcePathList, Constants::injectionSuffix, injectedTempFiles);
+            if (!skipProbing && pass==0)  sourcePathList = GetWithProbeFiles(sourcePathList, Constants::injectionSuffix, injectedTempFiles);
 
 
             // Creating the Clang Tool
@@ -155,8 +166,8 @@ namespace auto_concept {
             factory.get()->customMatcher = customMatcher;
             factory.get()->customMatchHandler = customMatchHandler;
             factory.get()->resources = resources;
-            if (pass == 0 && !CLOptions::SkipProbingOption) factory.get()->globalState = AutoConceptGlobalState::InjectionPass;
-            else                                            factory.get()->globalState = AutoConceptGlobalState::FinalPass;
+            if (pass == 0 && !skipProbing) factory.get()->globalState = AutoConceptGlobalState::InjectionPass;
+            else                           factory.get()->globalState = AutoConceptGlobalState::FinalPass;
             factory.get()->injectionProbingSuffix = Constants::injectionSuffix;
             
             // Deleting temp files, because the rewriter on suffixed files wont work if the file already exist
@@ -168,7 +179,7 @@ namespace auto_concept {
 
 
             // Collecting virtual results and early exit
-            if (pass == 1 || CLOptions::SkipProbingOption || customMatcher || customMatchHandler)  {
+            if (pass == 1 || skipProbing)  {
                 if (virtualRun) {
                     if (auto FixedVirtualFile = Tool.getFiles().getVirtualFileSystem().openFileForRead(Constants::virtualFileOut)) {
                         if (auto FixedVirtualFileBuffer = FixedVirtualFile.get().get()->getBuffer(Constants::virtualFileOut)) {
