@@ -17,7 +17,7 @@ using namespace ranges;
 
 // [Test]
 // [Comment] Testing random acces range
-// [Arg]-ignore-type=class std::initializer_list<int>
+// [Arg] -ignore-type=class std::initializer_list<int>
 // [Arg] -test-concept=random_access_range
 // [Arg] -test-concept=contiguous_range
 namespace UNIQUE_NS {

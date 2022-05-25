@@ -67,12 +67,11 @@ namespace auto_concept {
         static llvm::cl::opt<int> MaxAllowOption;
         static llvm::cl::opt<int> LogLevelOption;
         static llvm::cl::opt<bool> KeepTempFilesOption;
-        //static llvm::cl::opt<int> MinPreventOption;
+        static llvm::cl::opt<int> MinPreventOption;
 
         static llvm::cl::alias RewriteOptionAlias;
         static llvm::cl::alias RewriteSuffixOptionAlias;
         static llvm::cl::alias SkipProbingOptionAlias;
-        //static llvm::cl::alias ThresholdOptionAlias;
 
         // A help message for this specific tool can be added afterwards.
         static llvm::cl::extrahelp MoreHelp;
