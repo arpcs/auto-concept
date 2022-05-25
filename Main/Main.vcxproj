@@ -119,18 +119,18 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\llvm-project\clang\include;C:\llvm-project\llvm\include;C:\llvm-project\build\include;C:\llvm-project\build\tools\clang\include;%(AdditionalIncludeDirectories);$(IncludePath)</IncludePath>
     <TargetName>AutoConcept</TargetName>
-    <LibraryPath>C:\llvm-project\build\Debug\lib;C:\llvm-project\build\Debug\bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\llvm-project\build\Debug\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\llvm-project\clang\include;C:\llvm-project\llvm\include;C:\llvm-project\build\include;C:\llvm-project\build\tools\clang\include;%(AdditionalIncludeDirectories);$(IncludePath)</IncludePath>
-    <LibraryPath>C:\llvm-project\build\Release\lib;C:\llvm-project\build\Release\bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\llvm-project\build\Release\lib;$(LibraryPath)</LibraryPath>
     <TargetName>AutoConcept</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\llvm-project\clang\include;C:\llvm-project\llvm\include;C:\llvm-project\build\include;C:\llvm-project\build\tools\clang\include;%(AdditionalIncludeDirectories);$(IncludePath)</IncludePath>
-    <LibraryPath>C:\llvm-project\build\RelWithDebInfo\lib;C:\llvm-project\build\RelWithDebInfo\bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\llvm-project\build\RelWithDebInfo\lib;$(LibraryPath)</LibraryPath>
     <TargetName>AutoConcept</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
