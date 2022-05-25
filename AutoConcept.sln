@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest", "UnitTest\UnitTest.vcxproj", "{5D7E3474-8126-4A9B-9786-59A5EF35AB6B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6524B1EF-59A3-4745-8981-D7125B141A3E} = {6524B1EF-59A3-4745-8981-D7125B141A3E}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AutoConcept", "AutoConcept\AutoConcept.vcxproj", "{41233B8F-B0FD-4024-81D2-82908CC59531}"
 EndProject
