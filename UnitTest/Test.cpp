@@ -14,7 +14,7 @@ namespace auto_concept_test {
 		for (auto& testCase : reader)
 		{
 			std::cout << std::endl << "[Starting "<< ++counter << ". Concept Rewrite Test]" << std::endl << std::endl;
-			//EXPECT_EQ(runner(testCase.test, testCase.commandArgs), testCase.expected);
+			EXPECT_EQ(runner(testCase.test, testCase.commandArgs), testCase.expected);
 		}
 	}
 
