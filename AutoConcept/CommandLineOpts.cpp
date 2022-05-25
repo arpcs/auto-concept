@@ -87,10 +87,15 @@ namespace auto_concept {
             llvm::cl::init(0),
             llvm::cl::desc("Max number of semantically correct specializations the genereted concept is allowed to prevent"),
             llvm::cl::cat(MyToolCategory));
+        llvm::cl::opt<int> CLOptions::MinPreventOption("min-prevent",
+            llvm::cl::init(0),
+            llvm::cl::desc("Min number of semantically incorrect specializations the genereted concept have to prevent"),
+            llvm::cl::cat(MyToolCategory));
         llvm::cl::opt<int> CLOptions::MaxAllowOption("max-allow",
             llvm::cl::init(0),
             llvm::cl::desc("Max number of semantically incorrect specializations the genereted concept could allow"),
             llvm::cl::cat(MyToolCategory));
+
 
         // String options
         llvm::cl::opt<std::string> CLOptions::RewriteSuffixOption("rewrite-suffix",

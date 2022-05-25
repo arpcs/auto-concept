@@ -57,19 +57,19 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\llvm-project\clang\include;C:\llvm-project\llvm\include;C:\llvm-project\build\include;C:\llvm-project\build\tools\clang\include;%(AdditionalIncludeDirectories);$(IncludePath)</IncludePath>
-    <LibraryPath>C:\llvm-project\build\Debug\lib;C:\llvm-project\build\Debug\bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\llvm-project\build\Debug\lib;$(LibraryPath)</LibraryPath>
     <Microsoft-GoogleTest-Disable-gtest_main>true</Microsoft-GoogleTest-Disable-gtest_main>
     <TargetName>AutoConcept-test</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\llvm-project\clang\include;C:\llvm-project\llvm\include;C:\llvm-project\build\include;C:\llvm-project\build\tools\clang\include;%(AdditionalIncludeDirectories);$(IncludePath)</IncludePath>
-    <LibraryPath>C:\llvm-project\build\Release\lib;C:\llvm-project\build\Release\bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\llvm-project\build\Release\lib;$(LibraryPath)</LibraryPath>
     <Microsoft-GoogleTest-Disable-gtest_main>true</Microsoft-GoogleTest-Disable-gtest_main>
     <TargetName>AutoConcept-test</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <IncludePath>C:\llvm-project\clang\include;C:\llvm-project\llvm\include;C:\llvm-project\build\include;C:\llvm-project\build\tools\clang\include;%(AdditionalIncludeDirectories);$(IncludePath)</IncludePath>
-    <LibraryPath>C:\llvm-project\build\RelWithDebInfo\lib;C:\llvm-project\build\RelWithDebInfo\bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\llvm-project\build\RelWithDebInfo\lib;$(LibraryPath)</LibraryPath>
     <Microsoft-GoogleTest-Disable-gtest_main>true</Microsoft-GoogleTest-Disable-gtest_main>
     <TargetName>AutoConcept-test</TargetName>
   </PropertyGroup>

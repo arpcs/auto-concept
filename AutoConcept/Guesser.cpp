@@ -81,7 +81,7 @@ namespace auto_concept {
 				}
 			}
 
-			if (conceptWhere != -1 && minNumberOfPassingTypes > 0) {
+			if (conceptWhere != -1 && minNumberOfPassingTypes > 0 && minNumberOfPassingTypes <= resources->types.size() - CLOptions::MinPreventOption) {
 				ret[tParamIndex] = SpecializedConcept{ resources->concepts[conceptWhere] , templateParams[tParamIndex] };
 			}
 
