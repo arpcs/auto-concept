@@ -113,6 +113,7 @@ namespace auto_concept {
     }
 
     void MatchHandler::onStartOfTranslationUnit() {
+        haveMoreThanZeroMatch = false;
         matches.clear();
     }
 
@@ -125,6 +126,7 @@ namespace auto_concept {
             if (firstContext != nullptr) {
                 auto& DiagnosticsEngine = firstContext->getDiagnostics();
                 Rewriter = createRewriter(DiagnosticsEngine, *firstContext);
+                haveMoreThanZeroMatch = true;
             }
         }  
         if (this->tuState == AutoConceptTuState::InjectingProbes) InjectProbes(matches, resources);

@@ -20,7 +20,9 @@ namespace auto_concept {
                             isInStdNamespace()
                         ),
                         isInStdNamespace(),
-                        isExpansionInSystemHeader()
+                        hasDescendant(
+                            nonTypeTemplateParmDecl()
+                        )
                     )
                 ),
                 isExpansionInMainFile()

@@ -92,6 +92,25 @@ namespace auto_concept {
         }
 
     void Consumer::HandleTranslationUnit(clang::ASTContext& Context) {
+
         matchFinder.matchAST(Context);
+
+        // Generate a temp out file for the probe manager even if we have no matches
+        if (!handler.haveMoreThanZeroMatch && handler.tuState == AutoConceptTuState::InjectingProbes && handler.DoRewrite) {
+            MatchHandler::RewriterPointer Rewriter = nullptr;
+            auto& DiagnosticsEngine = Context.getDiagnostics();
+            Rewriter = handler.createRewriter(DiagnosticsEngine, Context);
+
+            auto fileStartPos = DiagnosticsEngine.getSourceManager().getLocForStartOfFile(DiagnosticsEngine.getSourceManager().getMainFileID());
+            auto FixIt = FixItHint::CreateInsertion(fileStartPos, "// [AutoConcept] No matches found\n");
+            const auto diagID = DiagnosticsEngine.getCustomDiagID(clang::DiagnosticsEngine::Remark, "No template matches found");
+            // So we destroy our builder to execute it..
+            {
+                const auto& builder = DiagnosticsEngine.Report(diagID);
+                builder.AddFixItHint(FixIt);
+            }
+
+            Rewriter->WriteFixedFiles();
+        }
     }
 }

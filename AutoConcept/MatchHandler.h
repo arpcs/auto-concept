@@ -67,6 +67,8 @@ namespace auto_concept {
         std::shared_ptr<Resources> resources;
         AutoConceptTuState tuState;
         GuesserCollection::InnerType guessers;
+        bool haveMoreThanZeroMatch = false;
+
 
         friend Consumer;
         /// Allocates a \c FixItRewriter and sets it as the client of the given \p DiagnosticsEngine.
