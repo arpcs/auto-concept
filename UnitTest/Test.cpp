@@ -28,6 +28,16 @@ namespace auto_concept_test {
 			EXPECT_EQ(runner(testCase.test, testCase.commandArgs), testCase.expected);
 		}
 	}
+	TEST(ComplexTests, ComplexTests) {
+		TestReader reader("ComplexTests.cpp");
+
+		int counter = 0;
+		for (auto& testCase : reader)
+		{
+			std::cout << std::endl << "[Starting " << ++counter << ". Complex Test]" << std::endl << std::endl;
+			EXPECT_EQ(runner(testCase.test, testCase.commandArgs), testCase.expected);
+		}
+	}
 }
 
 int main(int argc, char** argv) {

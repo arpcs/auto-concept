@@ -201,8 +201,9 @@ namespace auto_concept {
                         specParamObj.good = !spec->isInvalidDecl();
                         guesser.templateSpecs.insert(specParamObj);
                     }
-
-                    auto fullName = funcTemp->getCanonicalDecl()->getQualifiedNameAsString();
+                    auto fullLoc = firstContext->getFullLoc(funcTemp->getBeginLoc());
+                    auto fullName = funcTemp->getCanonicalDecl()->getQualifiedNameAsString()+" Line: "+ to_string(fullLoc.getSpellingLineNumber()) 
+                        + " Column: " + to_string(fullLoc.getSpellingColumnNumber());
                     auto& guesserMap = *guessers.get();
                     guesserMap[fullName] = guesser;
                 }

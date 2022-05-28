@@ -33,6 +33,7 @@ namespace auto_concept {
 
 			for (size_t i = 0; i < resources->concepts.size(); i++) {
 
+				if (resources->concepts[i].passingTypes.size() <= 1) continue;
 				
 				// Check for concept-type fitting
 				int allowedRemaining = CLOptions::MaxAllowOption;

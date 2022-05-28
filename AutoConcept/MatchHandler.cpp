@@ -143,7 +143,9 @@ namespace auto_concept {
                 if (constraints.size() > 0) continue;
 
                 Guesser guesser;
-                auto fullName = funcTemp->getCanonicalDecl()->getQualifiedNameAsString();
+                auto fullLoc = firstContext->getFullLoc(funcTemp->getBeginLoc());
+                auto fullName = funcTemp->getCanonicalDecl()->getQualifiedNameAsString() + " Line: " + to_string(fullLoc.getSpellingLineNumber())
+                    + " Column: " + to_string(fullLoc.getSpellingColumnNumber());
                 if (guessers && guessers.get()->find(fullName) != guessers.get()->end())
                     guesser = guessers.get()->at(fullName);
                 if (funcTemp->getTemplateParameters()) {
