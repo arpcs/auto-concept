@@ -57,7 +57,7 @@ namespace auto_concept {
         );
         conceptProgressBar.End();
 
-        ProgressBar templateProgressBar("Filling basic template predictate parameters",
+        ProgressBar templateProgressBar("Filling basic template predicate parameters",
             std::count_if(resources.concepts.begin(), resources.concepts.end(), [](Concept& r) { return !r.isConcept; }));
         RunApp(input, {},
             [&]() { return decl( has(templateTypeParmDecl()), has(varDecl(isConstexpr(), hasType(booleanType())))).bind("varTempDec"); },
@@ -80,10 +80,10 @@ namespace auto_concept {
 
         for (const auto& conceptRow : resources.concepts) {
             if (!conceptRow.found) {
-                llvm::outs() << "Concept or template predictate not found: " << conceptRow.name << "\n";
+                llvm::outs() << "Concept or template predicate not found: " << conceptRow.name << "\n";
             }
             else if (conceptRow.numberOfArguments == 0 || conceptRow.numberOfArguments > 3) {
-                llvm::outs() << "Concept or template predictate with few or too many number of required arguments: " << conceptRow.name << " : " << conceptRow.numberOfArguments << "\n";
+                llvm::outs() << "Concept or template predicate with few or too many number of required arguments: " << conceptRow.name << " : " << conceptRow.numberOfArguments << "\n";
             }
         }
         llvm::outs() << "\n";

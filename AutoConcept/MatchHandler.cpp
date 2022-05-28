@@ -138,6 +138,10 @@ namespace auto_concept {
      
             if (auto* funcTemp = const_cast<clang::FunctionTemplateDecl*>(firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("Trivial FunctionTemplateDecl"))) {
 
+                llvm::SmallVector< const Expr* > constraints;
+                funcTemp->getAssociatedConstraints(constraints);
+                if (constraints.size() > 0) continue;
+
                 Guesser guesser;
                 auto fullName = funcTemp->getCanonicalDecl()->getQualifiedNameAsString();
                 if (guessers && guessers.get()->find(fullName) != guessers.get()->end())
@@ -163,7 +167,6 @@ namespace auto_concept {
                     auto fitting = guesser.GetFittingConcepts(resources);
                     
                     // Rewriting
-
                     const auto& funcDecl = funcTemp->getTemplatedDecl();
 
                     FullSourceLoc FullLocation = firstContext->getFullLoc(funcDecl->getBeginLoc());
