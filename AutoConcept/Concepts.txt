@@ -33,7 +33,7 @@ predicate	specifies that a callable type is a Boolean predicate	1	concepts	TRUE	
 relation	specifies that a callable type is a binary relation	3	concepts	TRUE	TRUE	TRUE		
 equivalence_relation	specifies that a relation imposes an equivalence relation	3	concepts	TRUE	TRUE	TRUE		
 strict_weak_order	specifies that a relation imposes a strict weak ordering	3	concepts	TRUE	TRUE	TRUE		
-indirectly_readable	specifies that a type is indirectly readable by applying operator *	1	iterator	TRUE	TRUE	TRUE		float*;char*;unsigned char*;int*;double*;long long*;unsigned int*;unsigned long long*;class std::unique_ptr<int>;class std::shared_ptr<int>
+indirectly_readable	specifies that a type is indirectly readable by applying operator *	1	iterator	TRUE	TRUE	TRUE		char*;int*;float*;double*;long long*;unsigned char*;unsigned int*;unsigned long long*;class std::unique_ptr<int>;class std::shared_ptr<int>
 indirectly_writable	specifies that a value can be written to an iterator's referenced object	2	iterator	TRUE	TRUE	TRUE		
 weakly_incrementable	specifies that a semiregular type can be incremented with pre- and post-increment operators	1	iterator	TRUE	TRUE	TRUE		float*;char;short;char*;int;int*;unsigned char;double*;long long;long long*;unsigned char*;unsigned short;unsigned int;unsigned int*;unsigned long long;unsigned long long*
 incrementable	specifies that the increment operation on a weakly_incrementable type is equality-preserving and that the type is equality_comparable	1	iterator	TRUE	TRUE	TRUE		float*;char;short;char*;int;int*;unsigned char;double*;long long;long long*;unsigned char*;unsigned short;unsigned int;unsigned int*;unsigned long long;unsigned long long*
@@ -56,7 +56,7 @@ indirectly_movable	specifies that values may be moved from an indirectly_readabl
 indirectly_movable_storable	specifies that values may be moved from an indirectly_readable type to an indirectly_writable type and that the move may be performed via an intermediate object	2	iterator	TRUE	TRUE	TRUE		
 indirectly_copyable	specifies that values may be copied from an indirectly_readable type to an indirectly_writable type	2	iterator	TRUE	TRUE	TRUE		
 indirectly_copyable_storable	specifies that values may be copied from an indirectly_readable type to an indirectly_writable type and that the copy may be performed via an intermediate object	2	iterator	TRUE	TRUE	TRUE		
-indirectly_swappable	specifies that the values referenced by two indirectly_readable types can be swapped	1	iterator	TRUE	TRUE	TRUE		float*;char*;unsigned char*;int*;double*;long long*;unsigned int*;unsigned long long*;class std::unique_ptr<int>;class std::shared_ptr<int>
+indirectly_swappable	specifies that the values referenced by two indirectly_readable types can be swapped	1	iterator	TRUE	TRUE	TRUE		char*;int*;float*;double*;long long*;unsigned char*;unsigned int*;unsigned long long*;class std::unique_ptr<int>;class std::shared_ptr<int>
 indirectly_comparable	specifies that the values referenced by two indirectly_readable types can be compared	3	iterator	TRUE	TRUE	TRUE		
 permutable	specifies the common requirements of algorithms that reorder elements in place	1	iterator	TRUE	TRUE	TRUE		float*;char*;unsigned char*;int*;double*;long long*;unsigned int*;unsigned long long*
 mergeable	specifies the requirements of algorithms that merge sorted sequences into an output sequence by copying elements	3	iterator	TRUE	TRUE	TRUE		
@@ -146,7 +146,7 @@ is_invocable_v	checks if a type can be invoked (as if by std::invoke) with the g
 is_invocable_r_v	checks if a type can be invoked (as if by std::invoke) with the given argument types	2	type_traits	TRUE	TRUE	FALSE		
 is_nothrow_invocable_v	checks if a type can be invoked (as if by std::invoke) with the given argument types	1	type_traits	TRUE	TRUE	FALSE		
 is_nothrow_invocable_r_v	checks if a type can be invoked (as if by std::invoke) with the given argument types	2	type_traits	TRUE	TRUE	FALSE		
-is_layout_compatible	checks if two types are layout-compatible	0	type_traits	FALSE	TRUE	FALSE		
-is_pointer_interconvertible_base_of	checks if a type is a pointer-interconvertible (initial) base of another type	0	type_traits	FALSE	TRUE	FALSE		
-is_pointer_interconvertible_with_class	checks if objects of a type are pointer-interconvertible with the specified subobject of that type	0	type_traits	FALSE	TRUE	FALSE		
-is_corresponding_member	checks if two specified members correspond to each other in the common initial subsequence of two specified types	0	type_traits	FALSE	TRUE	FALSE		
+is_layout_compatible_v	checks if two types are layout-compatible	0	type_traits	FALSE	TRUE	FALSE		
+is_pointer_interconvertible_base_of_v	checks if a type is a pointer-interconvertible (initial) base of another type	0	type_traits	FALSE	TRUE	FALSE		
+is_pointer_interconvertible_with_class_v	checks if objects of a type are pointer-interconvertible with the specified subobject of that type	0	type_traits	FALSE	TRUE	FALSE		
+is_corresponding_member_v	checks if two specified members correspond to each other in the common initial subsequence of two specified types	0	type_traits	FALSE	TRUE	FALSE		
