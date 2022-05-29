@@ -115,6 +115,13 @@ namespace auto_concept {
                 argsCopy.push_back("--");
             }
             std::vector<const char*> finalArguments;
+
+            // Placing -- to the right position
+            if (auto minMinPos = find(argsCopy.begin(), argsCopy.end(), "--"); 
+                minMinPos != argsCopy.end()) {
+                iter_swap(minMinPos, argsCopy.end() - 1);
+            }
+
             for(const auto& arg: argsCopy) finalArguments.push_back(arg.c_str());
 
             // Parse the given arguments

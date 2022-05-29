@@ -81,7 +81,7 @@ namespace auto_concept {
         // Int options
         llvm::cl::opt<int> CLOptions::LogLevelOption("log-level",
             llvm::cl::init(0),
-            llvm::cl::desc("Logging level from 0 to 3, the lower the value the less details the program gives. ( 3 reports injected errors )"),
+            llvm::cl::desc("Logging level from 0 to 3, the lower the value the less details the program gives. ( 2 reports injected errors )"),
             llvm::cl::cat(MyToolCategory));
         llvm::cl::opt<int> CLOptions::MaxPreventOption("max-prevent",
             llvm::cl::init(0),
