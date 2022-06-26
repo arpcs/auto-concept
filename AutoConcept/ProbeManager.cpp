@@ -188,6 +188,8 @@ namespace auto_concept {
             auto firstMatch = *matchesPair.second.begin();
             ASTContext* firstContext = firstMatch.Context;
 
+            if (CLOptions::LogLevelOption >= 3) llvm::outs() << "[Collecting Probes]\n";
+
             if (auto* funcTemp = const_cast<clang::FunctionTemplateDecl*>(firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("Trivial FunctionTemplateDecl"))) {
                 if (funcTemp->getTemplateParameters()) {
                     Guesser guesser;

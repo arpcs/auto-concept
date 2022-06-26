@@ -24,6 +24,11 @@ namespace auto_concept {
 		}
 		tabLoc = line.find('\t', startLoc);
 		if (tabLoc != string::npos) {
+			this->desugaredName = line.substr(startLoc, tabLoc - startLoc);
+			startLoc = tabLoc + 1;
+		}
+		tabLoc = line.find('\t', startLoc);
+		if (tabLoc != string::npos) {
 			this->include = line.substr(startLoc, tabLoc - startLoc);
 			startLoc = tabLoc + 1;
 		}
@@ -36,6 +41,7 @@ namespace auto_concept {
 	std::string Type::toStr() {
 		std::string res;
 		res += this->name + "\t"s;
+		res += this->desugaredName + "\t"s;
 		res += this->include + "\t"s;
 		res += (this->cpp20std ? "TRUE"s : "FALSE"s);
 		return res;

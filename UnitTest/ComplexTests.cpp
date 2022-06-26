@@ -10,47 +10,99 @@
 #include <math.h>
 #include <ranges>
 #include <vector>
+#include <bitset>
+#include <algorithm>
 using namespace std;
 using namespace ranges;
-
+// [Test]
+// [Comment] Testing multiple template parameters
+// [Arg] -max-allow=2
+// [Arg] -max-prevent=1
+namespace UNIQUE_NS {
+	template<class T1, class T2>
+	void foo(T1 x, T2 y)
+	{
+		if (x.size() == 0) return;
+		if (*(y.begin()) > 0) return;
+		y[2] = y[2];
+		*y.begin() = y[2];
+	}
+	void test() {
+		foo(vector<long long>{1, 2, 3}, vector<long long>{1, 2, 3});
+	}
+}
+// [Expected]
+// [Comment] Both concepts should appear
+namespace UNIQUE_NS {
+	template<class T1, class T2>
+	requires sized_range<T1> && contiguous_range<T2>
+	void foo(T1 x, T2 y)
+	{
+		if (x.size() == 0) return;
+		if (*(y.begin()) > 0) return;
+		y[2] = y[2];
+		*y.begin() = y[2];
+	}
+	void test() {
+		foo(vector<long long>{1, 2, 3}, vector<long long>{1, 2, 3});
+	}
+}
 // [Test]
 // [Comment] Testing more functions at once
+// [Arg] -ignore-type=bool
 // [Arg] -test-concept=is_trivial_v
+// [Arg] -test-concept=is_arithmetic_v
 namespace UNIQUE_NS {
 	template <class T>
-	inline T next(T x) { return ++x; }
+	inline T foo(T x) {
+		x *= 2;
+		return ++x;
+	}
+
 	template <class T, class Distance>
-	inline T next(T x, Distance n)
+	inline T foo(T x, Distance n)
 	{
 		std::advance(x, n);
 		return x;
 	}
+
 	template <class T>
-	inline T prior(T x) { return --x; }
+	inline T bar(T x) {
+		x *= 2;
+		return --x;
+	}
+
 	template <class T, class Distance>
-	inline T prior(T x, Distance n)
+	inline T bar(T x, Distance n)
 	{
 		std::advance(x, -n);
 		return x;
 	}
 }
 // [Expected]
-// [Comment] The correct types should appear at the correct position
+// [Comment] Nothing should appear because of chrono
 namespace UNIQUE_NS {
 	template <class T>
-	requires is_trivial_v<T>
-	inline T next(T x) { return ++x; }
+	inline T foo(T x) {
+		x *= 2;
+		return ++x;
+	}
+
 	template <class T, class Distance>
-	inline T next(T x, Distance n)
+	inline T foo(T x, Distance n)
 	{
 		std::advance(x, n);
 		return x;
 	}
+
 	template <class T>
-	requires is_trivial_v<T>
-	inline T prior(T x) { return --x; }
+	inline T bar(T x) {
+		x *= 2;
+		return --x;
+	}
+
 	template <class T, class Distance>
-	inline T prior(T x, Distance n)
+	inline T bar(T x, Distance n)
 	{
 		std::advance(x, -n);
 		return x;
@@ -62,18 +114,27 @@ namespace UNIQUE_NS {
 namespace UNIQUE_NS {
 	template <class T>
 	requires is_arithmetic_v<T>
-	inline T next(T x) { return ++x; }
+	inline T foo(T x) {
+		x *= 2;
+		return ++x;
+	}
+
 	template <class T, class Distance>
-	inline T next(T x, Distance n)
+	inline T foo(T x, Distance n)
 	{
 		std::advance(x, n);
 		return x;
 	}
+
 	template <class T>
 	requires is_arithmetic_v<T>
-	inline T prior(T x) { return --x; }
+	inline T bar(T x) {
+		x *= 2;
+		return --x;
+	}
+
 	template <class T, class Distance>
-	inline T prior(T x, Distance n)
+	inline T bar(T x, Distance n)
 	{
 		std::advance(x, -n);
 		return x;
@@ -83,48 +144,60 @@ namespace UNIQUE_NS {
 // [Comment] Testing multiple arguments
 namespace UNIQUE_NS {
 	template <class T>
-	inline T next(T x) { return next(x, 1); }
-	template <class T, class Distance>
-	inline T next(T x, Distance n)
+	inline T foo(T x) {
+		return foo(x, 1);
+	}
+
+	template <class T, class T2>
+	inline T foo(T x, T2 n)
 	{
 		*x; ++x;
-		std::advance(x, n);
+		std::find(x, x, n);
 		return x;
 	}
-	template <class T, class Distance>
-	inline T prior(T x, Distance n)
+
+	template <class T, class T2>
+	inline T bar(T x, T2 n)
 	{
 		*x; ++x;
-		std::advance(x, -n);
+		std::sort(x, x);
 		return x;
 	}
+
 	template <class T>
-	inline T prior(T x) { return prior(x, 1); }
+	inline T bar(T x) { return bar(x, 1); }
 }
 // [Expected]
 // [Comment] The correct types should appear at the correct positions for each parameter. ( Chaining is not yet implemented )
 // [Arg] -test-concept=input_or_output_iterator
+// [Arg] -test-concept=is_pointer_v
+// [Arg] -keep-temp-files
 namespace UNIQUE_NS {
 	template <class T>
-	requires copy_constructible<T>
-	inline T next(T x) { return next(x, 1); }
-	template <class T, class Distance>
-	requires input_or_output_iterator<T> && signed_integral<Distance>
-	inline T next(T x, Distance n)
+	requires semiregular<T>
+	inline T foo(T x) {
+		return foo(x, 1);
+	}
+
+	template <class T, class T2>
+	requires input_iterator<T>
+	inline T foo(T x, T2 n)
 	{
 		*x; ++x;
-		std::advance(x, n);
+		std::find(x, x, n);
 		return x;
 	}
-	template <class T, class Distance>
-	requires input_or_output_iterator<T> && signed_integral<Distance>
-	inline T prior(T x, Distance n)
+
+	template <class T, class T2>
+	requires input_iterator<T>
+	inline T bar(T x, T2 n)
 	{
 		*x; ++x;
-		std::advance(x, -n);
+		std::sort(x, x);
 		return x;
 	}
+
 	template <class T>
-	requires copy_constructible<T>
-	inline T prior(T x) { return prior(x, 1); }
+	requires semiregular<T>
+	inline T bar(T x) { return bar(x, 1); }
 }

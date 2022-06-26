@@ -24,6 +24,7 @@ namespace auto_concept {
 		for (size_t i = 0; i < resources->types.size(); i++)
 		{
 			typesInResources[resources->types[i].name] = i;
+			typesInResources[resources->types[i].desugaredName] = i;
 		}
 
 		size_t tParamIndex = 0;
@@ -38,19 +39,28 @@ namespace auto_concept {
 				// Check for concept-type fitting
 				int allowedRemaining = CLOptions::MaxAllowOption;
 				int preventedRemaining = CLOptions::MaxPreventOption;
+				int analyzedTypes = 0;
 				for (const auto& specType : specTypeMap) {
-					if (!typesInResources.contains(specType.second.typeName)) continue;
+					if (!typesInResources.contains(specType.second.typeName)) {
+						if (CLOptions::LogLevelOption >= 3 && i == 5) llvm::outs()<<"Uncached Type " << specType.second.typeName<<"\t at template param index:"<< to_string(tParamIndex) <<"\n";
+						continue;
+					}
+					if (CLOptions::LogLevelOption >= 3 && i == 5) llvm::outs() << "Testing Type " << specType.second.typeName << "\t at template param index:" << to_string(tParamIndex) << "\n";
+
+					analyzedTypes++;
+					auto prettyTypeName = resources->types[typesInResources[specType.second.typeName]].name;
 
 					// Check if concepts says false when the specialization fails
 					if (specType.second.validity == Validity::bad) {
 						if (resources->concepts[i].passingTypes.contains(specType.second.typeName)) {
-							if (!CLOptions::contains(CLOptions::IgnoreTypeOption, specType.second.typeName)) {
+							if (!CLOptions::contains(CLOptions::IgnoreTypeOption, prettyTypeName)) {
 								allowedRemaining--;
 								if (CLOptions::contains(CLOptions::TestConceptOption, resources->concepts[i].name)) {
 									if (allowedRemaining > -5)
-										llvm::outs() << "[Test concept] * Concept '" + resources->concepts[i].name + "' allowed semantically incorrect specialization for template param index: " + to_string(tParamIndex) + "\tand type: " + specType.second.typeName + "\n";
+										llvm::outs() << "[Test concept] * Concept '" + resources->concepts[i].name + "' allowed semantically incorrect specialization for template param index: " 
+										+ to_string(tParamIndex) + "\tand type: " + prettyTypeName + "\n";
 								}
-								else if (allowedRemaining < 0) break;
+								else if (allowedRemaining < 0 && CLOptions::LogLevelOption < 2) break;
 							}
 						}
 					}
@@ -58,13 +68,14 @@ namespace auto_concept {
 					// Check if the concepts says true when the specialization passes
 					if (specType.second.validity == Validity::good) {
 						if (!resources->concepts[i].passingTypes.contains(specType.second.typeName)) {
-							if (!CLOptions::contains(CLOptions::IgnoreTypeOption, specType.second.typeName)) {
+							if (!CLOptions::contains(CLOptions::IgnoreTypeOption, prettyTypeName)) {
 								preventedRemaining--;
 								if (CLOptions::contains(CLOptions::TestConceptOption, resources->concepts[i].name)) {
 									if (preventedRemaining > -5)
-										llvm::outs() << "[Test concept] * Concept '" + resources->concepts[i].name + "' prevented semantically correct specialization for template param index: " + to_string(tParamIndex) + "\tand type: " + specType.second.typeName + "\n";
+										llvm::outs() << "[Test concept] * Concept '" + resources->concepts[i].name + "' prevented semantically correct specialization for template param index: " 
+										+ to_string(tParamIndex) + "\tand type: " + prettyTypeName + "\n";
 								}
-								else if (preventedRemaining < 0) break;
+								else if (preventedRemaining < 0 && CLOptions::LogLevelOption < 2) break;
 							}
 						}
 					}
@@ -74,8 +85,13 @@ namespace auto_concept {
 
 				if (allowedRemaining>=0 && preventedRemaining>=0) {
 
+					if (analyzedTypes < 4 && !CLOptions::SkipProbingOption) {
+						if (CLOptions::LogLevelOption >= 2)  llvm::outs() << "[Test concept] * Not enough analyzed types for Concept '" + resources->concepts[i].name + "' at template param index: " + to_string(tParamIndex) << "\n";
+						continue;
+					}
+
 					// Print stats for concept
-					if (CLOptions::contains(CLOptions::TestConceptOption, resources->concepts[i].name)) llvm::outs() << 
+					if (CLOptions::contains(CLOptions::TestConceptOption, resources->concepts[i].name) || CLOptions::LogLevelOption >= 2) llvm::outs() <<
 						"[Test concept] * Concept '" + resources->concepts[i].name + "' is a good fit for template param index: " + to_string(tParamIndex)
 						+"\tand have this many allowed types: "+to_string(resources->concepts[i].passingTypes.size())+"\tprevented: "<< 
 						resources->types.size()- resources->concepts[i].passingTypes.size() <<"\n";

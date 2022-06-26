@@ -61,6 +61,7 @@ namespace auto_concept {
         static llvm::cl::opt<bool> SkipProbingOption;
         static llvm::cl::opt<bool> GenerateResourcesOption;
         static llvm::cl::list<std::string> TestConceptOption;
+        static llvm::cl::list<std::string> WorkingDirectoryOption;
         
         static llvm::cl::list<std::string> IgnoreTypeOption;
         static llvm::cl::opt<int> MaxPreventOption;
@@ -72,6 +73,7 @@ namespace auto_concept {
         static llvm::cl::alias RewriteOptionAlias;
         static llvm::cl::alias RewriteSuffixOptionAlias;
         static llvm::cl::alias SkipProbingOptionAlias;
+        static llvm::cl::alias WorkingDirectoryOptionAlias;
 
         // A help message for this specific tool can be added afterwards.
         static llvm::cl::extrahelp MoreHelp;

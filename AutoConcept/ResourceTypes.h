@@ -14,6 +14,7 @@ namespace auto_concept {
 		Type(std::string_view line);
 		std::string toStr();
 		std::string name;
+		std::string desugaredName;
 		std::string include;
 		bool cpp20std = false;
 	};

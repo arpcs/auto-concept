@@ -26,10 +26,9 @@ namespace UNIQUE_NS {
 	}
 }
 // [Expected]
-// [Comment] So the more general conept trivial should appear here
+// [Comment] So no conept should appear here
 namespace UNIQUE_NS {
 	template<class T1>
-	requires is_trivial_v<T1>
 	void foo(T1 x)
 	{
 		pow(x, 2);
@@ -62,7 +61,7 @@ namespace UNIQUE_NS {
 }
 // [Expected]
 // [Comment] Or specify that we dont want too general concepts
-// [Arg] -min-prevent=25
+// [Arg] -min-prevent=40
 namespace UNIQUE_NS {
 	template<class T1>
 	void foo(T1 x)
@@ -78,30 +77,30 @@ namespace UNIQUE_NS {
 	template<class T1>
 	void foo(T1 x)
 	{
-		x[2];
-		x < x;
+		*x.begin() = x[2];
+		x.size();
 	}
 }
 // [Expected]
-// [Comment] Initializer list is allowed here, so random_access_range should be wrong here
+// [Comment] Initializer list and string is allowed here, so random_access_range should be wrong here
 namespace UNIQUE_NS {
 	template<class T1>
 	void foo(T1 x)
 	{
-		x[2];
-		x < x;
+		*x.begin() = x[2];
+		x.size();
 	}
 }
 // [Expected]
-// [Comment] But if we ignore 1 incorrect type it should apply
-// [Arg] -max-allow=1
+// [Comment] But if we ignore 2 incorrect types it should apply
+// [Arg] -max-allow=2
 namespace UNIQUE_NS {
 	template<class T1>
 	requires random_access_range<T1>
 	void foo(T1 x)
 	{
-		x[2];
-		x < x;
+		*x.begin() = x[2];
+		x.size();
 	}
 }
 // [Test]

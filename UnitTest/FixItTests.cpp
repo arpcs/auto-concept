@@ -14,12 +14,15 @@ using namespace ranges;
 // [Test]
 // [Comment] Testing random acces range
 // [Arg] -ignore-type=class std::initializer_list<int>
+// [Arg] -ignore-type=class std::map<int,int>
+// [Arg] -ignore-type=class std::unordered_map<int,int>
 // [Arg] -test-concept=random_access_range
 // [Arg] -test-concept=contiguous_range
 namespace UNIQUE_NS {
 	template<class T1>
 	void foo(T1 x)
 	{
+		x.size();
 		x[2];
 	}
 }
@@ -29,6 +32,7 @@ namespace UNIQUE_NS {
 	template<class T1>
 	void foo(T1 x)
 	{
+		x.size();
 		x[2];
 	}
 }
@@ -40,17 +44,22 @@ namespace UNIQUE_NS {
 	requires random_access_range<T1>
 	void foo(T1 x)
 	{
+		x.size();
 		x[2];
 	}
 }
 // [Test]
-// [Comment] Testing random acces range with comparison
+// [Comment] Testing random acces range with iterators
 // [Arg] -ignore-type=class std::initializer_list<int>
+// [Arg] -ignore-type=class std::map<int,int>
+// [Arg] -ignore-type=class std::unordered_map<int,int>
+// [Arg] -test-concept=random_access_range
 namespace UNIQUE_NS {
 	template<class T1>
 	void foo(T1 x)
 	{
-		x < x;
+		x.size();
+		x.begin();
 		x[2];
 	}
 }
@@ -61,7 +70,8 @@ namespace UNIQUE_NS {
 	requires random_access_range<T1>
 	void foo(T1 x)
 	{
-		x < x;
+		x.size();
+		x.begin();
 		x[2];
 	}
 }

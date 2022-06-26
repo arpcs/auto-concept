@@ -24,8 +24,7 @@ namespace auto_concept {
                             nonTypeTemplateParmDecl()
                         )
                     )
-                ),
-                isExpansionInMainFile()
+                )
             ).bind("Trivial FunctionTemplateDecl")
         );
 

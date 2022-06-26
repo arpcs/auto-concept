@@ -91,14 +91,51 @@ namespace auto_concept {
 
     void MatchHandler::run(const MatchFinder::MatchResult& Result) {
 
+        // For custom matchers we pass the control to it
         if (this->customMatchHandler) {
             this->customMatchHandler(Result);
             return;
         }
 
         ASTContext* Context = Result.Context;
+
+        if (!Context) return;
+
         auto& map = Result.Nodes.getMap();
 
+        // Get the function template declaration node
+        auto* functionTD = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("Trivial FunctionTemplateDecl");
+        
+        // Check if the node is expanded in the main file or allowed by the Working-Directory command line option
+        if (functionTD) {
+            auto expansionLoc = Context->getSourceManager().getExpansionLoc(functionTD->getBeginLoc());
+            if (!Context->getSourceManager().isInMainFile(expansionLoc)) {
+                auto fileId = Context->getSourceManager().getFileID(expansionLoc);
+                if (fileId.isInvalid()) return;
+                const FileEntry* fileEntry = Context->getSourceManager().getFileEntryForID(fileId);
+                if (!fileEntry) return;
+                auto fileDir = fileEntry->getDir();
+                if (!fileDir) return;
+                bool allowedFile = false;
+                for (auto& workingDir : CLOptions::WorkingDirectoryOption) {
+                    if (workingDir == ".") {
+                        if (auto mainWorkingDir = Context->getSourceManager().getFileManager().getVirtualFileSystem().getCurrentWorkingDirectory()) {
+                            if (fileDir->getName().startswith(mainWorkingDir.get())) {
+                                allowedFile = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (fileDir->getName().startswith(workingDir)) {
+                        allowedFile = true;
+                        break;
+                    }
+                }
+                if (!allowedFile) return;
+            }
+        }
+
+        // Log all matches and dump the nodes when the log level CL option is high enough
         for (auto& m : map) {
             if (CLOptions::LogLevelOption >= 3) {
                 llvm::outs() << "Match found: " << m.first << "\n";
@@ -107,9 +144,10 @@ namespace auto_concept {
             }
         }
 
+        if (!functionTD) return;
+
         // Collect the matcher for later use. It's probably very expensive, but easier to handle for now
-        if (const auto* func = Result.Nodes.getNodeAs<clang::FunctionTemplateDecl>("Trivial FunctionTemplateDecl"))
-            matches[func->getID()].push_back(Result);
+        matches[functionTD->getID()].push_back(Result);
     }
 
     void MatchHandler::onStartOfTranslationUnit() {
@@ -135,6 +173,8 @@ namespace auto_concept {
         for (auto& matchesPair : matches) {
             auto firstMatch = *matchesPair.second.begin();
             ASTContext* firstContext = firstMatch.Context;
+
+            if (CLOptions::LogLevelOption >= 3) llvm::outs() << "[Acting on results]\n";
      
             if (auto* funcTemp = const_cast<clang::FunctionTemplateDecl*>(firstMatch.Nodes.getNodeAs<clang::FunctionTemplateDecl>("Trivial FunctionTemplateDecl"))) {
 
@@ -160,7 +200,7 @@ namespace auto_concept {
                             auto fullType = param.getAsType().getCanonicalType().getAsString();
                             specParamObj.types.push_back(fullType);
                         }
-
+                        
                         specParamObj.good = !spec->isInvalidDecl();
                         guesser.templateSpecs.insert(specParamObj);
                     }

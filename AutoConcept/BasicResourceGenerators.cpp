@@ -115,7 +115,7 @@ namespace auto_concept {
 
         unordered_map<int, int> IDToConcept, IDToType;
         int ID = 0, conceptInd = 0;
-        string conceptTesters;
+        string conceptTesters, typeTesters;
         for (const auto& conceptsRow : resources.concepts) {
             int typeInd = 0;
             if (conceptsRow.numberOfArguments >= 1)  for (const auto& typesRow : resources.types) {
@@ -129,10 +129,32 @@ namespace auto_concept {
             conceptInd++;
         }
 
-        string conceptIncludes = baseIncludes;
-        for (auto& conceptIncludeRow : includesMap) conceptIncludes+="\n#include <"+ conceptIncludeRow.first+">";
+        int typeInd = 0;
+        for (const auto& typesRow : resources.types) {
+            //if (typesRow.name != "void")
+            typeTesters += "\n void TypeTestFunc"+ to_string(typeInd) +"(" + typesRow.name + " parmVar"+ to_string(typeInd) +"){}; ";
+            typeInd++;
+        }
 
-        string finalConceptInput = conceptIncludes + "\n void foo(){\n" + conceptTesters+"\n }";
+        string allIncludes = baseIncludes;
+        for (auto& includeRow : includesMap) allIncludes +="\n#include <"+ includeRow.first+">";
+
+        string finalTypetInput = allIncludes + "\n \n" + typeTesters + "\n";
+        RunApp(finalTypetInput, {},
+            [&]() { return functionDecl(isExpansionInMainFile(), hasParameter(0, parmVarDecl().bind("parmVarDecl"))); },
+            [&](const MatchFinder::MatchResult& result) {
+                if (const auto* parVarDecl = result.Nodes.getNodeAs<clang::ParmVarDecl>("parmVarDecl")) {
+                    auto typeStr = parVarDecl->getType().getCanonicalType().getAsString();
+                    int typeInd = stoi(parVarDecl->getDeclName().getAsString().substr(string("parmVar").size()));
+                    resources.types[typeInd].desugaredName = typeStr;
+                    //llvm::outs() << typeInd << "\n";
+                    //resources.concepts[IDToConcept[ID]].passingTypes.insert(resources.types[IDToType[ID]].name);
+                }
+                conceptProgressBar.Tick();
+            }
+        );
+
+        string finalConceptInput = allIncludes + "\n void foo(){\n" + conceptTesters+"\n }";
         RunApp(finalConceptInput, {},
             [&]() { return varDecl(isConstexpr(), isExpansionInMainFile()).bind("VarDecl"); },
             [&](const MatchFinder::MatchResult& result) {
@@ -146,7 +168,13 @@ namespace auto_concept {
                             {
                                 int ID = stoi(conceptDec->getDeclName().getAsString().substr(string("testVal").size()));
                                 resources.concepts[IDToConcept[ID]].passingTypes.insert(
-                                    resources.types[IDToType[ID]].name);
+                                    resources.types[IDToType[ID]].desugaredName);
+
+                                
+                                /*param.getAsType().getCanonicalType().getAsString();
+                                llvm::outs() << fullType << "\n";
+                                llvm::outs() << param.getAsType().getAsString() << "\n";
+                                llvm::outs() << param.getAsType().getUnqualifiedType().getAsString() << "\n";*/
                             }
                             conceptProgressBar.Tick();
                         }
@@ -163,4 +191,5 @@ namespace auto_concept {
         resources.Save();
         int h = 5;
     }
+
 }

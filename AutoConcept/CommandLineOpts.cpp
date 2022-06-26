@@ -109,6 +109,10 @@ namespace auto_concept {
             llvm::cl::NumOccurrencesFlag(llvm::cl::ZeroOrMore),
             llvm::cl::desc("Ignores the following type when choosing concepts"),
             llvm::cl::cat(MyToolCategory));
+        llvm::cl::list<std::string> CLOptions::WorkingDirectoryOption("working-directory",
+            llvm::cl::NumOccurrencesFlag(llvm::cl::ZeroOrMore),
+            llvm::cl::desc("Consider included header files in the given path."),
+            llvm::cl::cat(MyToolCategory));
 
         // Option aliases
         llvm::cl::alias CLOptions::RewriteSuffixOptionAlias("x",
@@ -122,6 +126,10 @@ namespace auto_concept {
         llvm::cl::alias CLOptions::RewriteOptionAlias("r",
             llvm::cl::desc("Alias for rewrite option"),
             llvm::cl::aliasopt(CLOptions::RewriteOption)
+        );
+        llvm::cl::alias CLOptions::WorkingDirectoryOptionAlias("w",
+            llvm::cl::desc("Alias for working-directory option"),
+            llvm::cl::aliasopt(CLOptions::WorkingDirectoryOption)
         );
 
         // A help message for this specific tool can be added afterwards.
